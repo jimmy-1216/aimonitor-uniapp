@@ -1,132 +1,81 @@
 <template>
   <div class="page-wrap">
-    <div class="page-header">
-      <div class="header-orb" />
-      <text class="page-title">提交充值记录</text>
-      <text class="page-sub">记录您的 AI 工具使用情况</text>
+    <!-- 导航栏 -->
+    <div class="nav-bar">
+      <div>
+        <div class="nav-title">提交记录</div>
+        <div class="nav-sub">记录 AI 工具使用情况</div>
+      </div>
     </div>
 
-    <div class="container" style="margin-top: 24px; margin-bottom: 100px;">
-      <div class="glass-card" style="padding: 20px;">
-        <!-- AI 平台 -->
-        <div style="margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">
-            <span style="color: #f87171;">*</span> AI 平台
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <div
-              v-for="p in PLATFORMS"
-              :key="p"
-              class="chip"
-              :class="{ active: form.platform === p }"
-              @click="form.platform = p; form.customPlatform = ''"
-            >{{ p }}</div>
-          </div>
-          <input
-            v-if="form.platform === '其他'"
-            v-model="form.customPlatform"
-            class="form-input"
-            placeholder="请输入平台名称"
-            style="margin-top: 10px;"
-          />
+    <div style="padding:12px 0 20px;">
+      <!-- AI 平台 -->
+      <div class="card" style="margin:0 16px 10px; padding:16px;">
+        <div style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:10px;">
+          <span style="color:var(--red);">*</span> AI 平台
         </div>
-
-        <div class="divider" />
-
-        <!-- 底层大模型 -->
-        <div style="margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">
-            <span style="color: #f87171;">*</span> 底层大模型
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <div
-              v-for="m in LLM_MODELS"
-              :key="m"
-              class="chip"
-              :class="{ active: form.llmModel === m }"
-              @click="form.llmModel = m"
-            >{{ m }}</div>
-          </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <div v-for="p in PLATFORMS" :key="p" class="chip" :class="{active: form.platform===p}" @click="form.platform=p; form.customPlatform=''">{{ p }}</div>
         </div>
+        <input v-if="form.platform==='其他'" v-model="form.customPlatform" class="form-input" placeholder="请输入平台名称" style="margin-top:10px;" />
+      </div>
 
-        <div class="divider" />
+      <!-- 底层大模型 -->
+      <div class="card" style="margin:0 16px 10px; padding:16px;">
+        <div style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:10px;">
+          <span style="color:var(--red);">*</span> 底层大模型
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <div v-for="m in LLM_MODELS" :key="m" class="chip" :class="{active: form.llmModel===m}" @click="form.llmModel=m">{{ m }}</div>
+        </div>
+      </div>
 
-        <!-- 充值类型 -->
-        <div style="margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">充值类型</div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <div
-              v-for="t in RECHARGE_TYPES"
-              :key="t.value"
-              class="chip"
-              :class="{ active: form.rechargeType === t.value }"
-              @click="form.rechargeType = t.value"
-            >{{ t.label }}</div>
+      <!-- 充值类型 -->
+      <div class="card" style="margin:0 16px 10px; padding:16px;">
+        <div style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:10px;">充值类型</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <div v-for="t in RECHARGE_TYPES" :key="t.value" class="chip" :class="{active: form.rechargeType===t.value}" @click="form.rechargeType=t.value">{{ t.label }}</div>
+        </div>
+      </div>
+
+      <!-- 金额和日期 -->
+      <div class="card" style="margin:0 16px 10px;">
+        <div class="list-item" style="justify-content:space-between;">
+          <div style="font-size:14px; color:var(--text-secondary);">
+            <span style="color:var(--red);">*</span> 充值金额
+          </div>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <span style="color:var(--text-muted); font-size:14px;">¥</span>
+            <input v-model.number="form.amount" type="number" placeholder="0.00" min="0" step="0.01"
+              style="text-align:right; border:none; outline:none; font-size:16px; font-weight:600; color:var(--primary); width:80px; background:transparent;" />
           </div>
         </div>
-
-        <div class="divider" />
-
-        <!-- 充值金额 -->
-        <div style="margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">
-            <span style="color: #f87171;">*</span> 充值金额 (¥)
-          </div>
-          <input
-            v-model.number="form.amount"
-            type="number"
-            class="form-input"
-            placeholder="请输入金额"
-            min="0"
-            step="0.01"
-          />
+        <div class="list-item" style="justify-content:space-between; border-bottom:none;">
+          <div style="font-size:14px; color:var(--text-secondary);">充值日期</div>
+          <input v-model="form.rechargeDate" type="date"
+            style="border:none; outline:none; font-size:14px; color:var(--text-primary); background:transparent; text-align:right;" />
         </div>
+      </div>
 
-        <div class="divider" />
-
-        <!-- 充值日期 -->
-        <div style="margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">充值日期</div>
-          <input
-            v-model="form.rechargeDate"
-            type="date"
-            class="form-input"
-          />
+      <!-- 用途标签 -->
+      <div class="card" style="margin:0 16px 10px; padding:16px;">
+        <div style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:10px;">用途标签</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <div v-for="t in PURPOSE_TAGS" :key="t.value" class="chip" :class="{active: form.purposeTags.includes(t.value)}" @click="toggleTag(t.value)">{{ t.label }}</div>
         </div>
+      </div>
 
-        <div class="divider" />
+      <!-- 用途说明 -->
+      <div class="card" style="margin:0 16px 10px; padding:16px;">
+        <div style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:8px;">用途说明</div>
+        <textarea v-model="form.purposeDesc" class="form-input" placeholder="简述使用场景或目的..." rows="3"
+          style="resize:none; font-family:var(--font-main); line-height:1.6;" />
+      </div>
 
-        <!-- 用途标签 -->
-        <div style="margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">用途标签</div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <div
-              v-for="t in PURPOSE_TAGS"
-              :key="t.value"
-              class="chip"
-              :class="{ active: form.purposeTags.includes(t.value) }"
-              @click="toggleTag(t.value)"
-            >{{ t.label }}</div>
-          </div>
-        </div>
-
-        <div class="divider" />
-
-        <!-- 用途说明 -->
-        <div style="margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">用途说明</div>
-          <textarea
-            v-model="form.purposeDesc"
-            class="form-input"
-            placeholder="简述使用场景或目的..."
-            rows="3"
-            style="resize: none; font-family: var(--font-main);"
-          />
-        </div>
-
-        <!-- 提交按钮 -->
-        <button class="btn-primary" style="width: 100%; padding: 12px;" @click="submit">
-          {{ loading ? '提交中...' : '✓ 提交记录' }}
+      <!-- 提交按钮 -->
+      <div style="padding:0 16px; margin-top:4px;">
+        <button class="btn-primary" style="width:100%; padding:13px; font-size:15px; border-radius:10px;" @click="submit" :disabled="loading">
+          {{ loading ? '提交中...' : '提交记录' }}
         </button>
       </div>
     </div>
@@ -136,8 +85,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAppStore } from '@/store/app'
-import { PLATFORMS, LLM_MODELS, RECHARGE_TYPES, PURPOSE_TAGS } from '@/store/app'
+import { useAppStore, PLATFORMS, LLM_MODELS, RECHARGE_TYPES, PURPOSE_TAGS } from '@/store/app'
 
 const router = useRouter()
 const store = useAppStore()
@@ -162,7 +110,7 @@ function toggleTag(tag) {
 
 function submit() {
   if (!form.value.platform || !form.value.llmModel || !form.value.amount) {
-    alert('请填写必填项')
+    alert('请填写必填项（平台、模型、金额）')
     return
   }
   loading.value = true

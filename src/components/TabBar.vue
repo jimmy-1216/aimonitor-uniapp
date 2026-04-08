@@ -1,5 +1,5 @@
 <template>
-  <nav class="tab-bar">
+  <nav class="tab-bar" style="flex-shrink:0;">
     <router-link
       v-for="item in tabs"
       :key="item.to"
@@ -8,7 +8,7 @@
       :class="{ active: isActive(item) }"
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path :d="item.icon" />
+        <path :d="isActive(item) ? (item.iconFilled || item.icon) : item.icon" />
       </svg>
       <span>{{ item.label }}</span>
     </router-link>
@@ -36,8 +36,5 @@ const adminTabs = [
 ]
 
 const tabs = computed(() => store.currentUser.role === 'admin' ? adminTabs : employeeTabs)
-
-function isActive(item) {
-  return route.path === item.to || route.path.startsWith(item.to + '/')
-}
+function isActive(item) { return route.path === item.to || route.path.startsWith(item.to + '/') }
 </script>

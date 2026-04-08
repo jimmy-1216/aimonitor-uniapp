@@ -147,10 +147,12 @@ export const useAppStore = defineStore('app', () => {
     }
     return months.map((m, i) => {
       const prev = i > 0 ? months[i - 1] : null
-      const amount = records.value.filter(r => r.rechargeDate.startsWith(m)).reduce((s, r) => s + Number(r.amount), 0)
+      const monthRecs = records.value.filter(r => r.rechargeDate.startsWith(m))
+      const amount = monthRecs.reduce((s, r) => s + Number(r.amount), 0)
+      const count = monthRecs.length
       const prevAmount = prev ? records.value.filter(r => r.rechargeDate.startsWith(prev)).reduce((s, r) => s + Number(r.amount), 0) : 0
       const growth = prevAmount > 0 ? Math.round((amount - prevAmount) / prevAmount * 100) : 0
-      return { month: m.slice(5) + '月', amount, growth }
+      return { month: m.slice(5) + '月', amount, count, growth }
     })
   })
 
