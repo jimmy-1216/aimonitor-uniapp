@@ -1,10 +1,10 @@
 <template>
   <div class="page-wrap">
-    <!-- 导航栏 -->
-    <div class="nav-bar">
-      <div>
-        <div class="nav-title">趋势分析</div>
-        <div class="nav-sub">部门 AI 使用趋势</div>
+    <!-- 页面标题栏 -->
+    <div class="page-nav-bar">
+      <div class="page-nav-left">
+        <div class="page-nav-title">趋势分析</div>
+        <div class="page-nav-sub">部门 AI 使用趋势</div>
       </div>
     </div>
 

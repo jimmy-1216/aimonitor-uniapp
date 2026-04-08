@@ -1,10 +1,10 @@
 <template>
   <div class="page-wrap">
-    <!-- 导航栏 -->
-    <div class="nav-bar">
-      <div>
-        <div class="nav-title">历史记录</div>
-        <div class="nav-sub">共 {{ store.myRecords.length }} 条</div>
+    <!-- 页面标题栏 -->
+    <div class="page-nav-bar">
+      <div class="page-nav-left">
+        <div class="page-nav-title">历史记录</div>
+        <div class="page-nav-sub">共 {{ store.myRecords.length }} 条</div>
       </div>
     </div>
 

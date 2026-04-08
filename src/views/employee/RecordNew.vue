@@ -1,11 +1,12 @@
 <template>
   <div class="page-wrap">
-    <!-- 导航栏 -->
-    <div class="nav-bar">
-      <div>
-        <div class="nav-title">提交记录</div>
-        <div class="nav-sub">记录 AI 工具使用情况</div>
-      </div>
+    <!-- 页面标题栏 -->
+    <div class="page-nav-bar">
+      <button class="page-nav-back" @click="$router.back()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="page-nav-title">提交记录</div>
+      <div style="width:36px;"></div>
     </div>
 
     <div style="padding:12px 0 20px;">

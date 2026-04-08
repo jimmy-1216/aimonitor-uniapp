@@ -1,18 +1,18 @@
 <template>
   <div class="page-wrap">
-    <!-- 导航栏 -->
-    <div class="nav-bar" style="background: linear-gradient(135deg, #07c160, #09e870);">
-      <div>
-        <div class="nav-title" style="color:#fff;">智汇星盘</div>
-        <div class="nav-sub" style="color:rgba(255,255,255,0.8);">AI 效能台账</div>
+    <!-- 页面标题栏（微信小程序风格） -->
+    <div class="page-nav-bar" style="background: linear-gradient(135deg, #07c160, #09e870);">
+      <div class="page-nav-left">
+        <div class="page-nav-title" style="color:#fff;">我的看板</div>
+        <div class="page-nav-sub" style="color:rgba(255,255,255,0.8);">AI 效能台账</div>
       </div>
       <div style="font-size:22px;">🌟</div>
     </div>
 
     <!-- 用户信息横幅 -->
-    <div style="background: linear-gradient(135deg, #07c160, #09e870); padding: 0 16px 20px;">
+    <div style="background: linear-gradient(135deg, #07c160, #09e870); padding: 0 16px 24px;">
       <div style="display:flex; align-items:center; gap:12px;">
-        <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:#fff;">
+        <div class="avatar-circle">
           {{ store.currentUser.name[0] }}
         </div>
         <div>
@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <!-- 投入指数卡片 -->
+    <!-- 投入指数卡片（悬浮） -->
     <div style="margin: -16px 16px 0; position:relative; z-index:1;">
       <div class="card" style="padding:20px;">
         <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -69,7 +69,7 @@
         <div style="display:flex; align-items:flex-end; gap:6px; height:80px;">
           <div v-for="item in store.monthlyTrend" :key="item.month" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
             <div style="font-size:10px; color:var(--primary); font-weight:500;">{{ item.amount > 0 ? '¥'+item.amount : '' }}</div>
-            <div style="width:100%; background:var(--bg-section); border-radius:4px 4px 0 0; position:relative; min-height:4px;"
+            <div style="width:100%; border-radius:4px 4px 0 0; min-height:4px;"
               :style="{ height: Math.max(4, (item.amount / 300) * 60) + 'px', background: item.amount > 0 ? 'linear-gradient(180deg,#09e870,#07c160)' : '#f0f1f3' }">
             </div>
             <div style="font-size:10px; color:var(--text-muted);">{{ item.month }}</div>
@@ -98,8 +98,8 @@
     </div>
 
     <!-- 快速操作 -->
-    <div style="margin:12px 16px 0;">
-      <router-link to="/record/new" class="btn-primary" style="width:100%; padding:12px; font-size:15px;">
+    <div style="margin:12px 16px 16px;">
+      <router-link to="/record/new" class="btn-primary" style="width:100%; padding:13px; font-size:15px;">
         ＋ 提交充值记录
       </router-link>
     </div>

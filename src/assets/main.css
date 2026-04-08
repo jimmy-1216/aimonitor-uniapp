@@ -64,6 +64,7 @@ html, body {
   border: none; border-radius: 24px;
   cursor: pointer; transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(7,193,96,0.3);
+  text-decoration: none;
 }
 .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -130,20 +131,37 @@ html, body {
 .page-wrap {
   min-height: 100%;
   background: var(--bg-page);
-  /* 不需要 padding-bottom，TabBar 由外壳 flex 控制 */
 }
 
-/* ===== 导航栏 ===== */
-.nav-bar {
+/* ===== 页面标题栏（微信小程序风格） ===== */
+.page-nav-bar {
   position: sticky; top: 0; z-index: 100;
-  /* sticky 相对于 .page-content 滚动容器生效 */
   background: var(--bg-white);
   border-bottom: 1px solid var(--border-light);
-  padding: 12px 16px 10px;
+  padding: 10px 16px;
   display: flex; align-items: center; justify-content: space-between;
+  min-height: 48px;
 }
-.nav-title { font-size: 17px; font-weight: 600; color: var(--text-primary); }
-.nav-sub   { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.page-nav-left { display: flex; flex-direction: column; gap: 1px; }
+.page-nav-title { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+.page-nav-sub   { font-size: 12px; color: var(--text-muted); }
+.page-nav-back {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text-secondary); transition: background 0.15s;
+  flex-shrink: 0;
+}
+.page-nav-back:active { background: var(--bg-section); }
+
+/* 头像圆圈 */
+.avatar-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
 
 /* ===== TabBar ===== */
 .tab-bar {
@@ -151,11 +169,10 @@ html, body {
   background: var(--bg-white);
   border-top: 1px solid var(--border-light);
   flex-shrink: 0;
-  /* 不使用 fixed，由手机外壳 flex 布局控制 */
 }
 .tab-item {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 8px 0 6px; gap: 3px;
+  padding: 8px 0 10px; gap: 3px;
   cursor: pointer; text-decoration: none;
   color: var(--text-muted); transition: color 0.2s;
 }
@@ -208,7 +225,7 @@ html, body {
   width: 100%; max-width: 480px;
   background: var(--bg-white);
   border-radius: 16px 16px 0 0;
-  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  padding: 20px 16px 20px;
   animation: sheet-up 0.28s ease;
   max-height: 80vh; overflow-y: auto;
 }

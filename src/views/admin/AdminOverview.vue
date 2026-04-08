@@ -1,10 +1,10 @@
 <template>
   <div class="page-wrap">
-    <!-- 导航栏 -->
-    <div class="nav-bar" style="background:linear-gradient(135deg,#1677ff,#4096ff);">
-      <div>
-        <div class="nav-title" style="color:#fff;">部门总览</div>
-        <div class="nav-sub" style="color:rgba(255,255,255,0.8);">全部成员数据汇总</div>
+    <!-- 页面标题栏 -->
+    <div class="page-nav-bar" style="background:linear-gradient(135deg,#1677ff,#4096ff);">
+      <div class="page-nav-left">
+        <div class="page-nav-title" style="color:#fff;">部门总览</div>
+        <div class="page-nav-sub" style="color:rgba(255,255,255,0.8);">全部成员数据汇总</div>
       </div>
       <div style="font-size:22px;">📊</div>
     </div>
