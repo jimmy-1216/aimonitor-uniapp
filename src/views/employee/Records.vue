@@ -1,6 +1,5 @@
 <template>
   <div class="page-wrap">
-    <!-- 页面标题栏 -->
     <div class="page-nav-bar">
       <div class="page-nav-left">
         <div class="page-nav-title">历史记录</div>
@@ -10,58 +9,52 @@
 
     <!-- 搜索栏 -->
     <div class="search-bar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-      </svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a5568" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       <input v-model="search" placeholder="搜索平台、模型或用途..." />
-      <button v-if="search" @click="search=''" style="background:none; border:none; color:#bbb; cursor:pointer; font-size:14px;">✕</button>
+      <button v-if="search" @click="search=''" style="background:none; border:none; color:#4a5568; cursor:pointer; font-size:14px;">✕</button>
     </div>
 
-    <!-- 统计横条 -->
-    <div style="display:flex; gap:1px; margin:0 16px 12px; background:var(--border-light); border-radius:10px; overflow:hidden;">
-      <div style="flex:1; background:#fff; padding:10px; text-align:center;">
-        <div style="font-size:16px; font-weight:700; color:var(--primary);">¥{{ totalAmount }}</div>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">累计充值</div>
+    <!-- 统计条 -->
+    <div class="records-stat">
+      <div class="rs-item">
+        <div class="rs-val" style="color:#00d4ff;">¥{{ totalAmount }}</div>
+        <div class="rs-lbl">累计充值</div>
       </div>
-      <div style="flex:1; background:#fff; padding:10px; text-align:center;">
-        <div style="font-size:16px; font-weight:700; color:var(--blue);">{{ filtered.length }}</div>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">条记录</div>
+      <div class="rs-divider"></div>
+      <div class="rs-item">
+        <div class="rs-val" style="color:#a855f7;">{{ filtered.length }}</div>
+        <div class="rs-lbl">条记录</div>
       </div>
-      <div style="flex:1; background:#fff; padding:10px; text-align:center;">
-        <div style="font-size:16px; font-weight:700; color:var(--orange);">{{ platformCount }}</div>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">个平台</div>
+      <div class="rs-divider"></div>
+      <div class="rs-item">
+        <div class="rs-val" style="color:#00ff88;">{{ platformCount }}</div>
+        <div class="rs-lbl">个平台</div>
       </div>
     </div>
 
     <!-- 记录列表 -->
-    <div v-if="filtered.length > 0" style="display:flex; flex-direction:column; gap:0; margin:0 16px;">
-      <div v-for="(r, i) in filtered" :key="r.id" class="card" style="margin-bottom:10px; padding:14px;">
-        <!-- 头部 -->
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px;">
-          <div style="display:flex; align-items:center; gap:10px; flex:1;">
-            <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,#07c160,#09e870); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; flex-shrink:0;">
-              {{ r.platform[0] }}
-            </div>
-            <div style="flex:1; min-width:0;">
-              <div style="font-size:14px; font-weight:600; color:var(--text-primary);">{{ r.platform }}</div>
-              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">{{ r.llmModel }} · {{ r.rechargeDate }}</div>
+    <div v-if="filtered.length > 0" style="padding: 8px 16px 20px; display:flex; flex-direction:column; gap:8px;">
+      <div v-for="r in filtered" :key="r.id" class="record-card">
+        <div class="record-card-top">
+          <div class="record-card-top-left">
+            <div class="record-plat-icon">{{ r.platform[0] }}</div>
+            <div>
+              <div class="record-plat-name">{{ r.platform }}</div>
+              <div class="record-meta">{{ r.llmModel }} · {{ r.rechargeDate }}</div>
             </div>
           </div>
-          <div style="text-align:right; flex-shrink:0; margin-left:8px;">
-            <div style="font-size:16px; font-weight:700; color:var(--primary);">¥{{ r.amount }}</div>
-            <div class="tag tag-gray" style="font-size:10px; margin-top:4px; padding:2px 6px;">{{ RECHARGE_TYPE_LABELS[r.rechargeType] }}</div>
+          <div style="text-align:right;">
+            <div class="record-amount">¥{{ r.amount }}</div>
+            <div class="tag tag-gray" style="margin-top:4px; font-size:10px; padding:2px 6px;">{{ RECHARGE_TYPE_LABELS[r.rechargeType] }}</div>
           </div>
         </div>
-        <!-- 标签 -->
-        <div v-if="r.purposeTags.length > 0" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px;">
-          <div v-for="tag in r.purposeTags.slice(0,3)" :key="tag" class="tag tag-green" style="font-size:11px; padding:2px 8px;">{{ PURPOSE_LABELS[tag] }}</div>
-          <div v-if="r.purposeTags.length > 3" class="tag tag-gray" style="font-size:11px; padding:2px 8px;">+{{ r.purposeTags.length - 3 }}</div>
+        <div v-if="r.purposeTags.length > 0" style="display:flex; flex-wrap:wrap; gap:5px; margin: 8px 0 0;">
+          <div v-for="tag in r.purposeTags.slice(0,3)" :key="tag" class="tag tag-blue" style="font-size:10px; padding:2px 7px;">{{ PURPOSE_LABELS[tag] }}</div>
+          <div v-if="r.purposeTags.length > 3" class="tag tag-gray" style="font-size:10px; padding:2px 7px;">+{{ r.purposeTags.length - 3 }}</div>
         </div>
-        <!-- 描述 -->
-        <div v-if="r.purposeDesc" style="font-size:12px; color:var(--text-secondary); margin-bottom:8px; line-height:1.5;">{{ r.purposeDesc }}</div>
-        <!-- 底部 -->
-        <div style="display:flex; align-items:center; justify-content:space-between; padding-top:8px; border-top:1px solid var(--border-light);">
-          <div style="font-size:11px; color:var(--text-light);">{{ formatTime(r.createdAt) }}</div>
+        <div v-if="r.purposeDesc" class="record-desc">{{ r.purposeDesc }}</div>
+        <div class="record-footer">
+          <div class="record-time">{{ formatTime(r.createdAt) }}</div>
           <button class="btn-danger" @click="deleteRecord(r.id)">删除</button>
         </div>
       </div>
@@ -72,7 +65,7 @@
       <div class="empty-emoji">📭</div>
       <div class="empty-title">{{ search ? '没有匹配的记录' : '暂无充值记录' }}</div>
       <div class="empty-desc">{{ search ? '换个关键词试试' : '去提交您的第一条 AI 充值记录吧' }}</div>
-      <router-link v-if="!search" to="/record/new" class="btn-primary" style="margin-top:12px;">立即填报</router-link>
+      <router-link v-if="!search" to="/record/new" class="btn-primary" style="margin-top:14px; padding:10px 24px;">立即填报</router-link>
     </div>
   </div>
 </template>
@@ -102,8 +95,45 @@ function formatTime(iso) {
   const d = new Date(iso)
   return d.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
-
 function deleteRecord(id) {
   if (confirm('确定删除此记录？')) store.deleteRecord(id)
 }
 </script>
+
+<style scoped>
+.records-stat {
+  display: flex; align-items: center;
+  background: #111827; border-bottom: 1px solid rgba(99,179,237,0.1);
+  padding: 10px 0; margin-bottom: 2px;
+}
+.rs-item { flex: 1; text-align: center; }
+.rs-val { font-size: 17px; font-weight: 800; line-height: 1; }
+.rs-lbl { font-size: 10px; color: #4a5568; margin-top: 3px; }
+.rs-divider { width: 1px; height: 28px; background: rgba(99,179,237,0.1); }
+
+.record-card {
+  background: #111827;
+  border: 1px solid rgba(99,179,237,0.1);
+  border-radius: 12px; padding: 14px;
+  position: relative; overflow: hidden;
+}
+.record-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.25), transparent);
+}
+.record-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.record-card-top-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+.record-plat-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(168,85,247,0.2));
+  border: 1px solid rgba(0,212,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  color: #00d4ff; font-weight: 700; font-size: 14px;
+}
+.record-plat-name { font-size: 14px; font-weight: 600; color: #e8f4fd; }
+.record-meta { font-size: 11px; color: #4a5568; margin-top: 2px; }
+.record-amount { font-size: 17px; font-weight: 800; color: #00d4ff; }
+.record-desc { font-size: 12px; color: #4a5568; margin-top: 8px; line-height: 1.5; }
+.record-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(99,179,237,0.08); }
+.record-time { font-size: 11px; color: #4a5568; }
+</style>

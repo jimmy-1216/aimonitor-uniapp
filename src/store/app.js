@@ -4,6 +4,18 @@ import { ref, computed } from 'vue'
 // ===== 常量 =====
 export const PLATFORMS = ['ChatGPT', 'Claude', 'Gemini', 'Kimi', '文心一言', '通义千问', '讯飞星火', '其他']
 export const LLM_MODELS = ['GPT-4o', 'GPT-4', 'Claude 3.5', 'Claude 3', 'Gemini 1.5', 'Gemini Pro', 'Moonshot', 'ERNIE-4', 'Qwen-Max', '其他']
+// 充值渠道
+export const RECHARGE_CHANNELS = [
+  { value: 'official', label: '官方官网', icon: '🏢', tip: '' },
+  { value: 'xianyu', label: '闲鱼', icon: '🐟', tip: '第三方渠道，存在一定风险' },
+  { value: 'taobao', label: '淘宝/拼多多', icon: '🛒', tip: '第三方渠道，存在一定风险' },
+  { value: 'wechat_agent', label: '微信代充', icon: '💬', tip: '第三方渠道，存在一定风险' },
+  { value: 'group_buy', label: '团购拼单', icon: '👥', tip: '第三方渠道，存在一定风险' },
+  { value: 'other_third', label: '其他第三方', icon: '🔗', tip: '第三方渠道，存在一定风险' },
+]
+export const THIRD_PARTY_CHANNELS = ['xianyu','taobao','wechat_agent','group_buy','other_third']
+export const CHANNEL_LABELS = Object.fromEntries(RECHARGE_CHANNELS.map(c => [c.value, c.label]))
+
 export const RECHARGE_TYPES = [
   { value: 'subscription', label: '订阅套餐' },
   { value: 'topup', label: '充值余额' },
@@ -68,6 +80,10 @@ function genRecords() {
         rechargeDate: d.toISOString().slice(0, 10),
         purposeTags: tags[mi % tags.length],
         purposeDesc: ['用于日常编程辅助', '文案撰写与优化', '数据分析报告', '设计方案生成', '技术调研', ''][i % 6],
+        channel: ['official','xianyu','taobao','wechat_agent','official','official'][i % 6],
+        faceValue: [29, 49, 99, 199, 20, 50][i % 6],
+        actualPaid: [29, 38, 79, 160, 20, 50][i % 6],
+        channelRemark: ['', '闲鱼店铺：AI账号铺子', '淘宝：科技优选', '微信好友代充', '', ''][i % 6],
         screenshotUrls: [],
         createdAt: d.toISOString(),
       })
@@ -181,6 +197,25 @@ export const useAppStore = defineStore('app', () => {
   })
 
   // ===== Actions =====
+  // 渠道统计（含实付 vs 面值对比）
+  const channelStats = computed(() => {
+    const map = {}
+    records.value.forEach(r => {
+      const ch = r.channel || 'official'
+      if (!map[ch]) map[ch] = { channel: ch, label: CHANNEL_LABELS[ch] || ch, count: 0, faceValue: 0, actualPaid: 0 }
+      map[ch].count++
+      map[ch].faceValue += Number(r.faceValue || r.amount || 0)
+      map[ch].actualPaid += Number(r.actualPaid || r.amount || 0)
+    })
+    return Object.values(map).sort((a, b) => b.count - a.count)
+  })
+
+  const totalDiscount = computed(() => {
+    const face = records.value.reduce((s, r) => s + Number(r.faceValue || r.amount || 0), 0)
+    const paid = records.value.reduce((s, r) => s + Number(r.actualPaid || r.amount || 0), 0)
+    return face > 0 ? Math.round((1 - paid / face) * 100) : 0
+  })
+
   function addRecord(data) {
     const rec = {
       id: Date.now(),
@@ -208,6 +243,7 @@ export const useAppStore = defineStore('app', () => {
     myRecords, inputScore, monthAmount, monthlyTrend, purposeDist,
     allRecords, memberStats, deptTotal, deptAvgScore, deptMonthlyTrend,
     platformStats, purposeStats, modelStats,
+    channelStats, totalDiscount,
     addRecord, deleteRecord, switchRole,
   }
 })

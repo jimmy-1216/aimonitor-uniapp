@@ -46,10 +46,10 @@ function isActive(item) {
 .tab-bar {
   display: flex;
   align-items: stretch;
-  background: #fff;
-  border-top: 1px solid #f0f1f3;
+  background: rgba(10,14,26,0.97);
+  border-top: 1px solid rgba(99,179,237,0.12);
   flex-shrink: 0;
-  /* 高度固定，不使用 fixed 定位 */
+  backdrop-filter: blur(12px);
 }
 
 .tab-item {
@@ -58,15 +58,21 @@ function isActive(item) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 0 10px;
+  padding: 8px 0 12px;
   gap: 3px;
   cursor: pointer;
   text-decoration: none;
-  color: #bbb;
+  color: #2d3f55;
   transition: color 0.2s;
 }
 
-.tab-item.active { color: #07c160; }
+.tab-item.active {
+  color: #00d4ff;
+}
+
+.tab-item.active svg {
+  filter: drop-shadow(0 0 5px rgba(0,212,255,0.6));
+}
 
 .tab-item svg {
   width: 22px;
