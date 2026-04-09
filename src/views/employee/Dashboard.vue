@@ -12,7 +12,7 @@
           <div class="hero-avatar">{{ store.currentUser.name[0] }}</div>
           <div>
             <div class="hero-name">{{ store.currentUser.name }}</div>
-            <div class="hero-dept">{{ store.currentUser.dept }} · AI 效能台账</div>
+            <div class="hero-dept">AI 效能台账</div>
           </div>
         </div>
         <div class="hero-badge">
