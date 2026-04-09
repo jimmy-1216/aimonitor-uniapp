@@ -159,7 +159,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .dash-hero {
   position: relative;
   padding: 16px 16px 20px;
-  background: linear-gradient(160deg, #112035 0%, #0d1525 100%);
+  background: linear-gradient(160deg, #152a45 0%, #111d30 100%);
   overflow: hidden;
   border-bottom: 1px solid rgba(0,212,255,0.1);
 }
@@ -206,7 +206,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 /* 三维数据条 */
 .stat-row {
   display: flex; align-items: center;
-  background: #162030; border-bottom: 1px solid rgba(99,179,237,0.15);
+  background: #1a2840; border-bottom: 1px solid rgba(99,179,237,0.22);
   padding: 12px 0;
 }
 .stat-cell { flex: 1; display: flex; align-items: center; gap: 10px; justify-content: center; }
@@ -225,7 +225,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .trend-chart {
   display: flex; align-items: flex-end; gap: 6px;
   height: 110px; padding: 0 4px;
-  background: #162030; border-radius: 12px; border: 1px solid rgba(99,179,237,0.18);
+  background: #1a2840; border-radius: 12px; border: 1px solid rgba(99,179,237,0.28);
   padding: 12px 12px 8px;
   margin-bottom: 14px;
 }
@@ -236,7 +236,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .trend-month { font-size: 9px; color: #6b8099; }
 
 /* 用途分布 */
-.purpose-list { display: flex; flex-direction: column; gap: 8px; background: #162030; border-radius: 12px; border: 1px solid rgba(99,179,237,0.18); padding: 12px; margin-bottom: 14px; }
+.purpose-list { display: flex; flex-direction: column; gap: 8px; background: #1a2840; border-radius: 12px; border: 1px solid rgba(99,179,237,0.28); padding: 12px; margin-bottom: 14px; }
 .purpose-item { display: flex; align-items: center; gap: 8px; }
 .purpose-rank { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
 .rank-0 { background: rgba(255,214,10,0.15); color: #ffd60a; }
@@ -244,7 +244,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .rank-2 { background: rgba(180,120,60,0.1); color: #b47c3c; }
 .rank-3, .rank-4 { background: rgba(99,179,237,0.08); color: #6b8099; }
 .purpose-name { font-size: 12px; color: #a8bdd0; min-width: 56px; }
-.purpose-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+.purpose-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,0.10); border-radius: 3px; overflow: hidden; }
 .purpose-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; box-shadow: 0 0 6px rgba(0,212,255,0.3); }
 .purpose-count { font-size: 11px; color: #6b8099; min-width: 16px; text-align: right; }
 </style>

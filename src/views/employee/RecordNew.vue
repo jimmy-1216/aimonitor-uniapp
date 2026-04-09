@@ -250,8 +250,8 @@ function submit() {
 /* 表单块 */
 .form-block {
   margin: 0 16px;
-  background: #192033;
-  border: 1px solid rgba(99,179,237,0.15);
+  background: #1a2840;
+  border: 1px solid rgba(99,179,237,0.28);
   border-radius: 14px;
   padding: 14px;
   position: relative;
@@ -378,7 +378,7 @@ function submit() {
 .form-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 13px 16px;
-  background: #192033;
+  background: #1a2840;
   border: 1px solid rgba(99,179,237,0.15);
   border-radius: 14px;
 }

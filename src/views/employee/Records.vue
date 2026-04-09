@@ -103,17 +103,17 @@ function deleteRecord(id) {
 <style scoped>
 .records-stat {
   display: flex; align-items: center;
-  background: #111827; border-bottom: 1px solid rgba(99,179,237,0.1);
+  background: #1a2840; border-bottom: 1px solid rgba(99,179,237,0.22);
   padding: 10px 0; margin-bottom: 2px;
 }
 .rs-item { flex: 1; text-align: center; }
 .rs-val { font-size: 17px; font-weight: 800; line-height: 1; }
-.rs-lbl { font-size: 10px; color: #4a5568; margin-top: 3px; }
-.rs-divider { width: 1px; height: 28px; background: rgba(99,179,237,0.1); }
+.rs-lbl { font-size: 10px; color: #7a95aa; margin-top: 3px; }
+.rs-divider { width: 1px; height: 28px; background: rgba(99,179,237,0.2); }
 
 .record-card {
-  background: #111827;
-  border: 1px solid rgba(99,179,237,0.1);
+  background: #1a2840;
+  border: 1px solid rgba(99,179,237,0.28);
   border-radius: 12px; padding: 14px;
   position: relative; overflow: hidden;
 }
@@ -130,10 +130,10 @@ function deleteRecord(id) {
   display: flex; align-items: center; justify-content: center;
   color: #00d4ff; font-weight: 700; font-size: 14px;
 }
-.record-plat-name { font-size: 14px; font-weight: 600; color: #e8f4fd; }
-.record-meta { font-size: 11px; color: #4a5568; margin-top: 2px; }
+.record-plat-name { font-size: 14px; font-weight: 600; color: #f0f8ff; }
+.record-meta { font-size: 11px; color: #7a95aa; margin-top: 2px; }
 .record-amount { font-size: 17px; font-weight: 800; color: #00d4ff; }
-.record-desc { font-size: 12px; color: #4a5568; margin-top: 8px; line-height: 1.5; }
-.record-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(99,179,237,0.08); }
-.record-time { font-size: 11px; color: #4a5568; }
+.record-desc { font-size: 12px; color: #7a95aa; margin-top: 8px; line-height: 1.5; }
+.record-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(99,179,237,0.15); }
+.record-time { font-size: 11px; color: #7a95aa; }
 </style>

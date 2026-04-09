@@ -158,7 +158,12 @@ function genRecords() {
   MOCK_MEMBERS.forEach((m, mi) => {
     for (let i = 0; i < 8; i++) {
       const d = new Date()
-      d.setDate(d.getDate() - Math.floor(Math.random() * 60))
+      // 前3条数据固定在本月内（0~20天前），后5条在过去60天内
+      if (i < 3) {
+        d.setDate(d.getDate() - Math.floor(Math.random() * 20))
+      } else {
+        d.setDate(d.getDate() - (20 + Math.floor(Math.random() * 40)))
+      }
       const plat = platforms[(mi * 2 + i) % platforms.length]
       list.push({
         id: id++,

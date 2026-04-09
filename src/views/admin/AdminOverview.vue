@@ -90,7 +90,7 @@ const maxDeptTrend = computed(() => Math.max(...store.deptMonthlyTrend.map(t => 
 <style scoped>
 .admin-hero {
   position: relative; padding: 16px 16px 20px;
-  background: linear-gradient(160deg, #1a1040 0%, #0d1525 100%);
+  background: linear-gradient(160deg, #1e1248 0%, #111d30 100%);
   border-bottom: 1px solid rgba(168,85,247,0.15);
   overflow: hidden;
 }
@@ -107,7 +107,7 @@ const maxDeptTrend = computed(() => Math.max(...store.deptMonthlyTrend.map(t => 
 }
 .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .kpi-cell {
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(99,179,237,0.18);
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(99,179,237,0.28);
   border-radius: 10px; padding: 12px;
 }
 .kpi-cell-label { font-size: 11px; color: #6b8099; margin-bottom: 6px; }
@@ -118,15 +118,15 @@ const maxDeptTrend = computed(() => Math.max(...store.deptMonthlyTrend.map(t => 
 .section-title { font-size: 14px; font-weight: 700; color: #edf6ff; }
 .section-badge { font-size: 10px; color: #6b8099; background: rgba(255,255,255,0.06); border: 1px solid rgba(99,179,237,0.2); padding: 2px 8px; border-radius: 10px; }
 
-.trend-chart { display: flex; align-items: flex-end; gap: 6px; height: 110px; background: #162030; border-radius: 12px; border: 1px solid rgba(99,179,237,0.18); padding: 12px 12px 8px; margin-bottom: 14px; }
+.trend-chart { display: flex; align-items: flex-end; gap: 6px; height: 110px; background: #1a2840; border-radius: 12px; border: 1px solid rgba(99,179,237,0.28); padding: 12px 12px 8px; margin-bottom: 14px; }
 .trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .trend-amount { font-size: 9px; color: #a855f7; font-weight: 600; height: 12px; }
 .trend-bar-wrap { flex: 1; display: flex; align-items: flex-end; width: 100%; }
 .trend-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; transition: height 0.6s ease; }
 .trend-month { font-size: 9px; color: #6b8099; }
 
-.rank-list { background: #162030; border: 1px solid rgba(99,179,237,0.18); border-radius: 12px; overflow: hidden; }
-.rank-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid rgba(99,179,237,0.12); }
+.rank-list { background: #1a2840; border: 1px solid rgba(99,179,237,0.28); border-radius: 12px; overflow: hidden; }
+.rank-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid rgba(99,179,237,0.18); }
 .rank-item:last-child { border-bottom: none; }
 .rank-num { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
 .rn-0 { background: rgba(255,214,10,0.15); color: #ffd60a; }
