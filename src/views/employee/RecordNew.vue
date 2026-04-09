@@ -10,13 +10,43 @@
 
     <div style="padding: 12px 0 32px; display:flex; flex-direction:column; gap:10px;">
 
-      <!-- ① AI 平台 -->
+      <!-- ① AI 平台（分类展示） -->
       <div class="form-block">
         <div class="form-block-title">AI 平台 <span class="req">*</span></div>
-        <div class="chip-group">
-          <div v-for="p in PLATFORMS" :key="p" class="chip" :class="{active: form.platform===p}" @click="form.platform=p; form.customPlatform=''">{{ p }}</div>
+        <div v-for="cat in PLATFORM_CATEGORIES" :key="cat.key" class="plat-category">
+          <div class="plat-cat-header">
+            <span class="plat-cat-icon">{{ cat.icon }}</span>
+            <span class="plat-cat-label" :style="{ color: cat.color }">{{ cat.label }}</span>
+          </div>
+          <div class="plat-grid">
+            <div
+              v-for="p in cat.platforms" :key="p.value"
+              class="plat-item"
+              :class="{ active: form.platform === p.value }"
+              :style="form.platform === p.value ? { borderColor: cat.color, boxShadow: `0 0 10px ${cat.color}30` } : {}"
+              @click="form.platform = p.value; form.customPlatform = ''"
+            >
+              <span class="plat-item-icon">{{ p.icon }}</span>
+              <span class="plat-item-name" :style="form.platform === p.value ? { color: cat.color } : {}">{{ p.label }}</span>
+              <span class="plat-item-vendor">{{ p.vendor }}</span>
+            </div>
+          </div>
         </div>
-        <input v-if="form.platform==='其他'" v-model="form.customPlatform" class="form-input" placeholder="请输入平台名称" style="margin-top:10px;" />
+        <!-- 其他 -->
+        <div class="plat-category">
+          <div class="plat-grid">
+            <div
+              class="plat-item"
+              :class="{ active: form.platform === '其他' }"
+              @click="form.platform = '其他'"
+            >
+              <span class="plat-item-icon">➕</span>
+              <span class="plat-item-name" :style="form.platform === '其他' ? { color: '#94a3b8' } : {}">其他</span>
+              <span class="plat-item-vendor">自定义</span>
+            </div>
+          </div>
+        </div>
+        <input v-if="form.platform === '其他'" v-model="form.customPlatform" class="form-input" placeholder="请输入平台名称" style="margin-top:10px;" />
       </div>
 
       <!-- ② 底层大模型 -->
@@ -27,7 +57,7 @@
         </div>
       </div>
 
-      <!-- ③ 充值渠道（核心新增） -->
+      <!-- ③ 充值渠道 -->
       <div class="form-block">
         <div class="form-block-title">充值渠道 <span class="req">*</span></div>
         <div class="channel-grid">
@@ -39,8 +69,6 @@
             <div v-if="isThird(ch.value)" class="channel-badge">省钱</div>
           </div>
         </div>
-
-        <!-- 第三方风险提示 -->
         <div v-if="isThird(form.channel)" class="risk-tip">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           <span>第三方渠道存在封号/失效风险，请留存凭证截图</span>
@@ -55,15 +83,12 @@
         </div>
       </div>
 
-      <!-- ⑤ 金额区（官方：单一金额 / 第三方：面值+实付） -->
+      <!-- ⑤ 金额区 -->
       <div class="form-block">
         <div class="form-block-title">
-          {{ isThird(form.channel) ? '充值金额' : '充值金额' }}
-          <span class="req">*</span>
+          充值金额 <span class="req">*</span>
           <span v-if="isThird(form.channel) && discount > 0" class="discount-badge">省 {{ discount }}%</span>
         </div>
-
-        <!-- 官方渠道：单一金额 -->
         <div v-if="!isThird(form.channel)" class="amount-row">
           <div class="amount-label">充值金额</div>
           <div class="amount-input-wrap">
@@ -71,14 +96,9 @@
             <input v-model.number="form.faceValue" type="number" placeholder="0.00" min="0" step="0.01" class="amount-input" @input="form.actualPaid = form.faceValue" />
           </div>
         </div>
-
-        <!-- 第三方渠道：面值 + 实付 -->
         <template v-else>
           <div class="amount-row">
-            <div class="amount-label">
-              账户面值
-              <span class="amount-hint">充入账户的金额</span>
-            </div>
+            <div class="amount-label">账户面值<span class="amount-hint">充入账户的金额</span></div>
             <div class="amount-input-wrap">
               <span class="amount-symbol">¥</span>
               <input v-model.number="form.faceValue" type="number" placeholder="0.00" min="0" step="0.01" class="amount-input" />
@@ -86,16 +106,12 @@
           </div>
           <div class="amount-divider"></div>
           <div class="amount-row">
-            <div class="amount-label">
-              实际支付
-              <span class="amount-hint">你实际花了多少钱</span>
-            </div>
+            <div class="amount-label">实际支付<span class="amount-hint">你实际花了多少钱</span></div>
             <div class="amount-input-wrap">
               <span class="amount-symbol" style="color:#00ff88;">¥</span>
               <input v-model.number="form.actualPaid" type="number" placeholder="0.00" min="0" step="0.01" class="amount-input" style="color:#00ff88;" />
             </div>
           </div>
-          <!-- 折扣计算结果 -->
           <div v-if="form.faceValue > 0 && form.actualPaid > 0" class="discount-calc">
             <div class="dc-item">
               <div class="dc-label">折扣率</div>
@@ -157,17 +173,17 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAppStore, PLATFORMS, LLM_MODELS, RECHARGE_TYPES, RECHARGE_CHANNELS, PURPOSE_TAGS, THIRD_PARTY_CHANNELS } from '@/store/app'
+import { useAppStore, PLATFORM_CATEGORIES, LLM_MODELS, RECHARGE_TYPES, RECHARGE_CHANNELS, PURPOSE_TAGS, THIRD_PARTY_CHANNELS } from '@/store/app'
 
 const router = useRouter()
 const store = useAppStore()
 const loading = ref(false)
 
 const form = ref({
-  platform: PLATFORMS[0],
+  platform: PLATFORM_CATEGORIES[0].platforms[0].value,
   customPlatform: '',
   llmModel: LLM_MODELS[0],
-  rechargeType: 'topup',
+  rechargeType: 'subscription',
   channel: 'official',
   faceValue: null,
   actualPaid: null,
@@ -179,7 +195,6 @@ const form = ref({
 
 function isThird(ch) { return THIRD_PARTY_CHANNELS.includes(ch) }
 
-// 折扣计算
 const discount = computed(() => {
   if (!form.value.faceValue || !form.value.actualPaid) return 0
   return Math.max(0, Math.round((1 - form.value.actualPaid / form.value.faceValue) * 100))
@@ -205,8 +220,8 @@ function toggleTag(tag) {
 
 function submit() {
   const fv = form.value.faceValue
-  if (!form.value.platform || !form.value.llmModel || !fv || fv <= 0) {
-    alert('请填写必填项（平台、模型、金额）')
+  if (!form.value.platform || !fv || fv <= 0) {
+    alert('请填写必填项（平台、金额）')
     return
   }
   loading.value = true
@@ -218,7 +233,7 @@ function submit() {
       channel: form.value.channel,
       faceValue: fv,
       actualPaid: isThird(form.value.channel) ? (form.value.actualPaid || fv) : fv,
-      amount: fv, // 兼容旧字段
+      amount: fv,
       channelRemark: form.value.channelRemark,
       rechargeDate: form.value.rechargeDate,
       purposeTags: form.value.purposeTags,
@@ -235,8 +250,8 @@ function submit() {
 /* 表单块 */
 .form-block {
   margin: 0 16px;
-  background: #111827;
-  border: 1px solid rgba(99,179,237,0.1);
+  background: #192033;
+  border: 1px solid rgba(99,179,237,0.15);
   border-radius: 14px;
   padding: 14px;
   position: relative;
@@ -245,24 +260,50 @@ function submit() {
 .form-block::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.25), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
 }
 .form-block-title {
-  font-size: 12px; font-weight: 600; color: #94a3b8;
+  font-size: 12px; font-weight: 600; color: #b0c4d8;
   margin-bottom: 12px; letter-spacing: 0.5px;
   display: flex; align-items: center; gap: 6px;
 }
 .req { color: #ff4d6d; }
-.form-optional { font-size: 11px; color: #4a5568; font-weight: 400; }
+.form-optional { font-size: 11px; color: #6b7f96; font-weight: 400; }
 .chip-group { display: flex; flex-wrap: wrap; gap: 7px; }
+
+/* 平台分类 */
+.plat-category { margin-bottom: 14px; }
+.plat-category:last-child { margin-bottom: 0; }
+.plat-cat-header {
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 8px;
+}
+.plat-cat-icon { font-size: 13px; }
+.plat-cat-label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+.plat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.plat-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px 7px;
+  border-radius: 10px;
+  border: 1px solid rgba(99,179,237,0.12);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer; transition: all 0.18s;
+}
+.plat-item:active { opacity: 0.7; }
+.plat-item.active {
+  background: rgba(0,212,255,0.07);
+}
+.plat-item-icon { font-size: 18px; line-height: 1; }
+.plat-item-name { font-size: 11px; color: #b0c4d8; font-weight: 600; text-align: center; line-height: 1.2; }
+.plat-item-vendor { font-size: 9px; color: #5a7080; text-align: center; line-height: 1; }
 
 /* 渠道选择网格 */
 .channel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .channel-item {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   padding: 10px 6px; border-radius: 10px;
-  border: 1px solid rgba(99,179,237,0.1);
-  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(99,179,237,0.12);
+  background: rgba(255,255,255,0.03);
   cursor: pointer; transition: all 0.18s; position: relative;
 }
 .channel-item:active { opacity: 0.7; }
@@ -277,7 +318,7 @@ function submit() {
   box-shadow: 0 0 12px rgba(0,255,136,0.15);
 }
 .channel-icon { font-size: 20px; }
-.channel-label { font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.3; }
+.channel-label { font-size: 11px; color: #b0c4d8; text-align: center; line-height: 1.3; }
 .channel-item.active .channel-label { color: #00d4ff; }
 .channel-item.third.active .channel-label { color: #00ff88; }
 .channel-badge {
@@ -291,7 +332,7 @@ function submit() {
 .risk-tip {
   display: flex; align-items: flex-start; gap: 7px;
   margin-top: 12px; padding: 10px 12px;
-  background: rgba(255,149,0,0.06); border: 1px solid rgba(255,149,0,0.2);
+  background: rgba(255,149,0,0.07); border: 1px solid rgba(255,149,0,0.25);
   border-radius: 8px; color: #ff9500; font-size: 12px; line-height: 1.5;
 }
 .risk-tip svg { flex-shrink: 0; margin-top: 1px; }
@@ -301,29 +342,29 @@ function submit() {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 0;
 }
-.amount-label { font-size: 14px; color: #94a3b8; display: flex; flex-direction: column; gap: 2px; }
-.amount-hint { font-size: 11px; color: #4a5568; }
+.amount-label { font-size: 14px; color: #b0c4d8; display: flex; flex-direction: column; gap: 2px; }
+.amount-hint { font-size: 11px; color: #6b7f96; }
 .amount-input-wrap { display: flex; align-items: center; gap: 4px; }
-.amount-symbol { font-size: 16px; color: #4a5568; font-weight: 600; }
+.amount-symbol { font-size: 16px; color: #6b7f96; font-weight: 600; }
 .amount-input {
   border: none; outline: none; background: transparent;
   font-size: 22px; font-weight: 800; color: #00d4ff;
   text-align: right; width: 100px;
 }
 .amount-input::placeholder { color: #2a3a4a; font-weight: 400; font-size: 18px; }
-.amount-divider { height: 1px; background: rgba(99,179,237,0.08); margin: 2px 0; }
+.amount-divider { height: 1px; background: rgba(99,179,237,0.1); margin: 2px 0; }
 
 /* 折扣计算结果 */
 .discount-calc {
   display: flex; gap: 0;
   margin-top: 12px;
-  background: rgba(0,212,255,0.04);
-  border: 1px solid rgba(0,212,255,0.12);
+  background: rgba(0,212,255,0.05);
+  border: 1px solid rgba(0,212,255,0.15);
   border-radius: 10px; overflow: hidden;
 }
 .dc-item { flex: 1; padding: 10px 8px; text-align: center; border-right: 1px solid rgba(99,179,237,0.1); }
 .dc-item:last-child { border-right: none; }
-.dc-label { font-size: 10px; color: #4a5568; margin-bottom: 4px; }
+.dc-label { font-size: 10px; color: #6b7f96; margin-bottom: 4px; }
 .dc-val { font-size: 16px; font-weight: 800; }
 
 /* 折扣徽章 */
@@ -337,9 +378,9 @@ function submit() {
 .form-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 13px 16px;
-  background: #111827;
-  border: 1px solid rgba(99,179,237,0.1);
+  background: #192033;
+  border: 1px solid rgba(99,179,237,0.15);
   border-radius: 14px;
 }
-.form-row-label { font-size: 14px; color: #94a3b8; }
+.form-row-label { font-size: 14px; color: #b0c4d8; }
 </style>

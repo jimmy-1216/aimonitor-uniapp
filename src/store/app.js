@@ -1,9 +1,86 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-// ===== 常量 =====
-export const PLATFORMS = ['ChatGPT', 'Claude', 'Gemini', 'Kimi', '文心一言', '通义千问', '讯飞星火', '其他']
-export const LLM_MODELS = ['GPT-4o', 'GPT-4', 'Claude 3.5', 'Claude 3', 'Gemini 1.5', 'Gemini Pro', 'Moonshot', 'ERNIE-4', 'Qwen-Max', '其他']
+// ===== 平台分类体系 =====
+// 三大类：AI 对话、AI 编程、AI 效率工具
+export const PLATFORM_CATEGORIES = [
+  {
+    key: 'chat',
+    label: 'AI 对话',
+    icon: '💬',
+    color: '#00d4ff',
+    platforms: [
+      { value: 'ChatGPT', label: 'ChatGPT', icon: '🤖', vendor: 'OpenAI' },
+      { value: 'Claude', label: 'Claude', icon: '🔮', vendor: 'Anthropic' },
+      { value: 'Gemini', label: 'Gemini', icon: '✨', vendor: 'Google' },
+      { value: 'Kimi', label: 'Kimi', icon: '🌙', vendor: 'Moonshot' },
+      { value: 'Monica', label: 'Monica', icon: '👩', vendor: 'Monica AI' },
+      { value: '文心一言', label: '文心一言', icon: '🌊', vendor: '百度' },
+      { value: '通义千问', label: '通义千问', icon: '🔯', vendor: '阿里' },
+      { value: '讯飞星火', label: '讯飞星火', icon: '⚡', vendor: '科大讯飞' },
+      { value: 'DeepSeek', label: 'DeepSeek', icon: '🐋', vendor: 'DeepSeek' },
+      { value: 'Grok', label: 'Grok', icon: '🌀', vendor: 'xAI' },
+      { value: 'Perplexity', label: 'Perplexity', icon: '🔍', vendor: 'Perplexity AI' },
+    ],
+  },
+  {
+    key: 'coding',
+    label: 'AI 编程',
+    icon: '💻',
+    color: '#a855f7',
+    platforms: [
+      { value: 'Cursor', label: 'Cursor', icon: '⌨️', vendor: 'Anysphere' },
+      { value: 'GitHub Copilot', label: 'Copilot', icon: '🐙', vendor: 'GitHub' },
+      { value: 'Windsurf', label: 'Windsurf', icon: '🏄', vendor: 'Codeium' },
+      { value: 'Codex', label: 'Codex', icon: '📦', vendor: 'OpenAI' },
+      { value: 'Bolt', label: 'Bolt', icon: '⚡', vendor: 'StackBlitz' },
+      { value: 'v0', label: 'v0', icon: '🎨', vendor: 'Vercel' },
+      { value: 'Replit', label: 'Replit', icon: '🔁', vendor: 'Replit' },
+      { value: 'Tabnine', label: 'Tabnine', icon: '📝', vendor: 'Tabnine' },
+    ],
+  },
+  {
+    key: 'tools',
+    label: 'AI 效率工具',
+    icon: '🛠️',
+    color: '#00ff88',
+    platforms: [
+      { value: 'Manus', label: 'Manus', icon: '🤲', vendor: 'Manus AI' },
+      { value: 'Notion AI', label: 'Notion AI', icon: '📓', vendor: 'Notion' },
+      { value: 'Midjourney', label: 'Midjourney', icon: '🎨', vendor: 'Midjourney' },
+      { value: 'Suno', label: 'Suno', icon: '🎵', vendor: 'Suno AI' },
+      { value: 'ElevenLabs', label: 'ElevenLabs', icon: '🎙️', vendor: 'ElevenLabs' },
+      { value: 'Runway', label: 'Runway', icon: '🎬', vendor: 'Runway' },
+      { value: 'Pika', label: 'Pika', icon: '📹', vendor: 'Pika Labs' },
+      { value: 'Gamma', label: 'Gamma', icon: '📊', vendor: 'Gamma App' },
+      { value: 'Napkin AI', label: 'Napkin AI', icon: '🗒️', vendor: 'Napkin' },
+    ],
+  },
+]
+
+// 扁平化平台列表（兼容旧代码）
+export const PLATFORMS = [
+  ...PLATFORM_CATEGORIES.flatMap(c => c.platforms.map(p => p.value)),
+  '其他',
+]
+
+// 平台 label/icon/category 映射
+export const PLATFORM_MAP = Object.fromEntries(
+  PLATFORM_CATEGORIES.flatMap(c =>
+    c.platforms.map(p => [p.value, { ...p, category: c.key, categoryLabel: c.label, categoryColor: c.color }])
+  )
+)
+
+// 大模型列表（按厂商分组）
+export const LLM_MODELS = [
+  'GPT-4o', 'GPT-4o mini', 'GPT-4', 'o1', 'o3',
+  'Claude 3.7', 'Claude 3.5', 'Claude 3',
+  'Gemini 2.0', 'Gemini 1.5', 'Gemini Pro',
+  'DeepSeek-V3', 'DeepSeek-R1',
+  'Moonshot', 'Qwen-Max', 'ERNIE-4',
+  '其他',
+]
+
 // 充值渠道
 export const RECHARGE_CHANNELS = [
   { value: 'official', label: '官方官网', icon: '🏢', tip: '' },
@@ -20,6 +97,7 @@ export const RECHARGE_TYPES = [
   { value: 'subscription', label: '订阅套餐' },
   { value: 'topup', label: '充值余额' },
   { value: 'api', label: 'API 额度' },
+  { value: 'credits', label: '积分/Credits' },
 ]
 export const PURPOSE_TAGS = [
   { value: 'coding', label: '编程开发' },
@@ -29,6 +107,9 @@ export const PURPOSE_TAGS = [
   { value: 'research', label: '调研学习' },
   { value: 'translation', label: '翻译润色' },
   { value: 'ppt', label: 'PPT 制作' },
+  { value: 'agent', label: 'AI Agent' },
+  { value: 'image', label: '图像生成' },
+  { value: 'video', label: '视频生成' },
   { value: 'other', label: '其他' },
 ]
 export const RECHARGE_TYPE_LABELS = Object.fromEntries(RECHARGE_TYPES.map(t => [t.value, t.label]))
@@ -61,29 +142,39 @@ const MOCK_MEMBERS = [
 function genRecords() {
   const list = []
   let id = 1
-  const platforms = ['ChatGPT', 'Claude', 'Gemini', 'Kimi', '通义千问']
-  const models = ['GPT-4o', 'Claude 3.5', 'Gemini 1.5', 'Moonshot', 'Qwen-Max']
-  const types = ['subscription', 'topup', 'api']
-  const tags = [['coding', 'analysis'], ['writing', 'ppt'], ['research', 'translation'], ['design', 'writing'], ['coding', 'other']]
+  const platforms = ['ChatGPT', 'Claude', 'Cursor', 'Manus', 'Gemini', 'Kimi', 'Monica', 'GitHub Copilot', 'Midjourney', 'DeepSeek']
+  const models = ['GPT-4o', 'Claude 3.5', 'Gemini 1.5', 'Moonshot', 'DeepSeek-V3', 'Claude 3.7', 'GPT-4o mini', 'DeepSeek-R1']
+  const types = ['subscription', 'topup', 'api', 'credits']
+  const tags = [
+    ['coding', 'agent'],
+    ['writing', 'ppt'],
+    ['research', 'translation'],
+    ['design', 'image'],
+    ['coding', 'analysis'],
+    ['video', 'design'],
+    ['agent', 'coding'],
+    ['writing', 'other'],
+  ]
   MOCK_MEMBERS.forEach((m, mi) => {
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       const d = new Date()
       d.setDate(d.getDate() - Math.floor(Math.random() * 60))
+      const plat = platforms[(mi * 2 + i) % platforms.length]
       list.push({
         id: id++,
         userId: m.id,
         userName: m.name,
-        platform: platforms[mi % platforms.length],
-        llmModel: models[mi % models.length],
+        platform: plat,
+        llmModel: models[(mi + i) % models.length],
         rechargeType: types[i % types.length],
-        amount: [29, 49, 99, 199, 20, 50][i % 6],
+        amount: [20, 29, 49, 99, 199, 39, 59, 149][i % 8],
         rechargeDate: d.toISOString().slice(0, 10),
-        purposeTags: tags[mi % tags.length],
-        purposeDesc: ['用于日常编程辅助', '文案撰写与优化', '数据分析报告', '设计方案生成', '技术调研', ''][i % 6],
-        channel: ['official','xianyu','taobao','wechat_agent','official','official'][i % 6],
-        faceValue: [29, 49, 99, 199, 20, 50][i % 6],
-        actualPaid: [29, 38, 79, 160, 20, 50][i % 6],
-        channelRemark: ['', '闲鱼店铺：AI账号铺子', '淘宝：科技优选', '微信好友代充', '', ''][i % 6],
+        purposeTags: tags[(mi + i) % tags.length],
+        purposeDesc: ['用于日常编程辅助', '文案撰写与优化', '数据分析报告', '设计方案生成', '技术调研', 'AI Agent 自动化', '图像/视频生成', ''][i % 8],
+        channel: ['official','xianyu','taobao','wechat_agent','official','official','official','official'][i % 8],
+        faceValue: [20, 29, 49, 99, 199, 39, 59, 149][i % 8],
+        actualPaid: [20, 22, 39, 79, 160, 39, 59, 149][i % 8],
+        channelRemark: ['', '闲鱼店铺：AI账号铺子', '淘宝：科技优选', '微信好友代充', '', '', '', ''][i % 8],
         screenshotUrls: [],
         createdAt: d.toISOString(),
       })
@@ -96,25 +187,20 @@ const ALL_RECORDS = genRecords()
 
 // ===== Store =====
 export const useAppStore = defineStore('app', () => {
-  // 当前用户（Demo 模式下可切换）
   const currentUser = ref({ id: 1, name: '张伟', openId: 'user_001', role: 'user' })
   const records = ref([...ALL_RECORDS])
 
-  // 当前用户的记录
   const myRecords = computed(() =>
     records.value.filter(r => r.userId === currentUser.value.id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   )
 
-  // 投入指数
   const inputScore = computed(() => calcInputScore(myRecords.value))
 
-  // 本月充值（thisMonth 使用 computed 确保跨月后自动更新）
   const thisMonth = computed(() => new Date().toISOString().slice(0, 7))
   const monthAmount = computed(() =>
     myRecords.value.filter(r => r.rechargeDate.startsWith(thisMonth.value)).reduce((s, r) => s + Number(r.amount), 0)
   )
 
-  // 月度趋势（最近6个月）
   const monthlyTrend = computed(() => {
     const months = []
     for (let i = 5; i >= 0; i--) {
@@ -127,12 +213,26 @@ export const useAppStore = defineStore('app', () => {
     }))
   })
 
-  // 用途分布
   const purposeDist = computed(() => {
     const map = {}
     myRecords.value.forEach(r => r.purposeTags.forEach(t => { map[t] = (map[t] || 0) + 1 }))
     return Object.entries(map).map(([tag, count]) => ({ tag, label: PURPOSE_LABELS[tag] || tag, count }))
       .sort((a, b) => b.count - a.count)
+  })
+
+  // 按平台分类统计（新增）
+  const categoryStats = computed(() => {
+    const map = {}
+    records.value.forEach(r => {
+      const info = PLATFORM_MAP[r.platform]
+      const cat = info ? info.category : 'other'
+      const catLabel = info ? info.categoryLabel : '其他'
+      const catColor = info ? info.categoryColor : '#94a3b8'
+      if (!map[cat]) map[cat] = { category: cat, label: catLabel, color: catColor, amount: 0, count: 0 }
+      map[cat].amount += Number(r.amount)
+      map[cat].count++
+    })
+    return Object.values(map).sort((a, b) => b.amount - a.amount)
   })
 
   // ===== 管理员数据 =====
@@ -196,8 +296,6 @@ export const useAppStore = defineStore('app', () => {
       .sort((a, b) => b.amount - a.amount)
   })
 
-  // ===== Actions =====
-  // 渠道统计（含实付 vs 面值对比）
   const channelStats = computed(() => {
     const map = {}
     records.value.forEach(r => {
@@ -242,7 +340,7 @@ export const useAppStore = defineStore('app', () => {
     currentUser, records,
     myRecords, inputScore, monthAmount, monthlyTrend, purposeDist,
     allRecords, memberStats, deptTotal, deptAvgScore, deptMonthlyTrend,
-    platformStats, purposeStats, modelStats,
+    platformStats, purposeStats, modelStats, categoryStats,
     channelStats, totalDiscount,
     addRecord, deleteRecord, switchRole,
   }

@@ -3,12 +3,12 @@
 
 :root {
   /* 科技深色主题色板 */
-  --bg-base:       #0a0e1a;
-  --bg-card:       #111827;
-  --bg-card2:      #1a2235;
-  --bg-input:      #1e2a3a;
-  --border:        rgba(99,179,237,0.15);
-  --border-bright: rgba(99,179,237,0.35);
+  --bg-base:       #0d1525;
+  --bg-card:       #162030;
+  --bg-card2:      #1e2d42;
+  --bg-input:      #1a2d40;
+  --border:        rgba(99,179,237,0.22);
+  --border-bright: rgba(99,179,237,0.45);
 
   /* 主色：青蓝渐变 */
   --primary:       #00d4ff;
@@ -28,9 +28,9 @@
   --yellow-dim:    rgba(255,214,10,0.15);
 
   /* 文字 */
-  --text-primary:   #e8f4fd;
-  --text-secondary: #94a3b8;
-  --text-muted:     #4a5568;
+  --text-primary:   #edf6ff;
+  --text-secondary: #a8bdd0;
+  --text-muted:     #6b8099;
   --text-bright:    #ffffff;
 
   /* 圆角 */
@@ -40,8 +40,8 @@
   --radius-xl:  24px;
 
   /* 阴影 */
-  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
-  --shadow-glow: 0 0 30px rgba(0,212,255,0.2);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 30px rgba(0,212,255,0.25);
 
   --font-main: -apple-system, 'PingFang SC', 'SF Pro Display', 'Helvetica Neue', sans-serif;
 
@@ -62,7 +62,7 @@
 
 html, body {
   font-family: var(--font-main);
-  background: #060a14;
+  background: #0b1220;
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -176,7 +176,7 @@ html, body {
 /* ===== 页面标题栏 ===== */
 .page-nav-bar {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(10,14,26,0.92);
+  background: rgba(13,21,37,0.94);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   padding: 10px 16px;
@@ -208,7 +208,7 @@ html, body {
 /* ===== TabBar ===== */
 .tab-bar {
   display: flex; align-items: stretch;
-  background: rgba(10,14,26,0.96);
+  background: rgba(13,21,37,0.97);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   backdrop-filter: blur(12px);
@@ -217,7 +217,7 @@ html, body {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 8px 0 10px; gap: 3px;
   cursor: pointer; text-decoration: none;
-  color: var(--text-muted); transition: color 0.2s;
+  color: #4a6070; transition: color 0.2s;
 }
 .tab-item.active { color: var(--primary); }
 .tab-item.active svg { filter: drop-shadow(0 0 4px rgba(0,212,255,0.6)); }
@@ -238,7 +238,7 @@ html, body {
 /* ===== 进度条 ===== */
 .progress-bar {
   height: 5px; border-radius: 3px;
-  background: rgba(255,255,255,0.06); overflow: hidden;
+  background: rgba(255,255,255,0.08); overflow: hidden;
 }
 .progress-fill {
   height: 100%; border-radius: 3px;

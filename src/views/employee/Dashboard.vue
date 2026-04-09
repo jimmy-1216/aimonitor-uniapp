@@ -159,7 +159,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .dash-hero {
   position: relative;
   padding: 16px 16px 20px;
-  background: linear-gradient(160deg, #0d1b2e 0%, #0a0e1a 100%);
+  background: linear-gradient(160deg, #112035 0%, #0d1525 100%);
   overflow: hidden;
   border-bottom: 1px solid rgba(0,212,255,0.1);
 }
@@ -167,8 +167,8 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
   position: absolute; border-radius: 50%;
   filter: blur(40px); pointer-events: none;
 }
-.hero-glow-1 { width: 180px; height: 180px; background: rgba(0,212,255,0.12); top: -60px; right: -40px; }
-.hero-glow-2 { width: 120px; height: 120px; background: rgba(168,85,247,0.1); bottom: -30px; left: 20px; }
+.hero-glow-1 { width: 180px; height: 180px; background: rgba(0,212,255,0.16); top: -60px; right: -40px; }
+.hero-glow-2 { width: 120px; height: 120px; background: rgba(168,85,247,0.14); bottom: -30px; left: 20px; }
 
 .hero-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .hero-user { display: flex; align-items: center; gap: 10px; }
@@ -179,8 +179,8 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
   display: flex; align-items: center; justify-content: center;
   font-size: 15px; font-weight: 700; color: #00d4ff;
 }
-.hero-name { font-size: 15px; font-weight: 700; color: #e8f4fd; }
-.hero-dept { font-size: 11px; color: #4a5568; margin-top: 2px; }
+.hero-name { font-size: 15px; font-weight: 700; color: #edf6ff; }
+.hero-dept { font-size: 11px; color: #6b8099; margin-top: 2px; }
 .hero-badge {
   display: flex; align-items: center; gap: 5px;
   padding: 4px 10px; border-radius: 20px;
@@ -191,41 +191,41 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 /* KPI 区 */
 .hero-kpi { display: flex; align-items: center; justify-content: space-between; }
 .kpi-main { flex: 1; }
-.kpi-label { font-size: 11px; color: #4a5568; margin-bottom: 4px; letter-spacing: 0.5px; }
+.kpi-label { font-size: 11px; color: #6b8099; margin-bottom: 4px; letter-spacing: 0.5px; }
 .kpi-value { font-size: 44px; font-weight: 800; color: #00d4ff; line-height: 1; letter-spacing: -2px; }
-.kpi-unit { font-size: 16px; font-weight: 400; color: #4a5568; letter-spacing: 0; }
-.kpi-bar { width: 140px; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.kpi-unit { font-size: 16px; font-weight: 400; color: #6b8099; letter-spacing: 0; }
+.kpi-bar { width: 140px; height: 4px; background: rgba(255,255,255,0.09); border-radius: 2px; margin-top: 10px; overflow: hidden; }
 .kpi-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #00d4ff, #a855f7); box-shadow: 0 0 8px rgba(0,212,255,0.5); transition: width 0.8s ease; }
 
 /* 圆环 */
 .kpi-ring-wrap { position: relative; width: 90px; height: 90px; }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .ring-num { font-size: 22px; font-weight: 800; color: #00d4ff; letter-spacing: -1px; }
-.ring-sub { font-size: 10px; color: #4a5568; }
+.ring-sub { font-size: 10px; color: #6b8099; }
 
 /* 三维数据条 */
 .stat-row {
   display: flex; align-items: center;
-  background: #111827; border-bottom: 1px solid rgba(99,179,237,0.1);
+  background: #162030; border-bottom: 1px solid rgba(99,179,237,0.15);
   padding: 12px 0;
 }
 .stat-cell { flex: 1; display: flex; align-items: center; gap: 10px; justify-content: center; }
 .stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
 .stat-val { font-size: 18px; font-weight: 800; line-height: 1; }
-.stat-lbl { font-size: 10px; color: #4a5568; margin-top: 2px; }
-.stat-divider { width: 1px; height: 32px; background: rgba(99,179,237,0.1); }
+.stat-lbl { font-size: 10px; color: #6b8099; margin-top: 2px; }
+.stat-divider { width: 1px; height: 32px; background: rgba(99,179,237,0.15); }
 
 /* 通用 Section */
 .section { padding: 14px 16px 0; }
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.section-title { font-size: 14px; font-weight: 700; color: #e8f4fd; letter-spacing: 0.3px; }
-.section-badge { font-size: 10px; color: #4a5568; background: rgba(255,255,255,0.04); border: 1px solid rgba(99,179,237,0.15); padding: 2px 8px; border-radius: 10px; }
+.section-title { font-size: 14px; font-weight: 700; color: #edf6ff; letter-spacing: 0.3px; }
+.section-badge { font-size: 10px; color: #6b8099; background: rgba(255,255,255,0.06); border: 1px solid rgba(99,179,237,0.2); padding: 2px 8px; border-radius: 10px; }
 
 /* 趋势图 */
 .trend-chart {
   display: flex; align-items: flex-end; gap: 6px;
   height: 110px; padding: 0 4px;
-  background: #111827; border-radius: 12px; border: 1px solid rgba(99,179,237,0.1);
+  background: #162030; border-radius: 12px; border: 1px solid rgba(99,179,237,0.18);
   padding: 12px 12px 8px;
   margin-bottom: 14px;
 }
@@ -233,18 +233,18 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .trend-amount { font-size: 9px; color: #00d4ff; font-weight: 600; height: 12px; }
 .trend-bar-wrap { flex: 1; display: flex; align-items: flex-end; width: 100%; }
 .trend-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; transition: height 0.6s ease; }
-.trend-month { font-size: 9px; color: #4a5568; }
+.trend-month { font-size: 9px; color: #6b8099; }
 
 /* 用途分布 */
-.purpose-list { display: flex; flex-direction: column; gap: 8px; background: #111827; border-radius: 12px; border: 1px solid rgba(99,179,237,0.1); padding: 12px; margin-bottom: 14px; }
+.purpose-list { display: flex; flex-direction: column; gap: 8px; background: #162030; border-radius: 12px; border: 1px solid rgba(99,179,237,0.18); padding: 12px; margin-bottom: 14px; }
 .purpose-item { display: flex; align-items: center; gap: 8px; }
 .purpose-rank { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
 .rank-0 { background: rgba(255,214,10,0.15); color: #ffd60a; }
 .rank-1 { background: rgba(148,163,184,0.1); color: #94a3b8; }
 .rank-2 { background: rgba(180,120,60,0.1); color: #b47c3c; }
-.rank-3, .rank-4 { background: rgba(99,179,237,0.06); color: #4a5568; }
-.purpose-name { font-size: 12px; color: #94a3b8; min-width: 56px; }
-.purpose-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+.rank-3, .rank-4 { background: rgba(99,179,237,0.08); color: #6b8099; }
+.purpose-name { font-size: 12px; color: #a8bdd0; min-width: 56px; }
+.purpose-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
 .purpose-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; box-shadow: 0 0 6px rgba(0,212,255,0.3); }
-.purpose-count { font-size: 11px; color: #4a5568; min-width: 16px; text-align: right; }
+.purpose-count { font-size: 11px; color: #6b8099; min-width: 16px; text-align: right; }
 </style>
