@@ -58,7 +58,8 @@ function isActive(item) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 0 12px;
+  /* 底部 padding 含安全区，防止 iPhone X+ 系列底部被黑条遇挡 */
+  padding: 8px 0 calc(12px + env(safe-area-inset-bottom, 0px));
   gap: 3px;
   cursor: pointer;
   text-decoration: none;

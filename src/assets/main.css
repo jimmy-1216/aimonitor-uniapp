@@ -44,6 +44,20 @@
   --shadow-glow: 0 0 30px rgba(0,212,255,0.2);
 
   --font-main: -apple-system, 'PingFang SC', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+
+  /* ===== 多端适配变量 ===== */
+  /* 状态栏高度（iOS 刘海屏约 44px，安卓约 24px） */
+  --status-bar-height: 44px;
+  /* 导航栏内容高度 */
+  --nav-bar-content-height: 44px;
+  /* 导航栏总高度 */
+  --nav-bar-height: calc(var(--status-bar-height) + var(--nav-bar-content-height));
+  /* 微信胶囊按钮安全右边距 */
+  --capsule-safe-right: 102px;
+  /* 底部安全区（iPhone X+ 系列） */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  /* 底部 TabBar 高度（含安全区） */
+  --tab-bar-height: calc(50px + var(--safe-area-bottom));
 }
 
 html, body {

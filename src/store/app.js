@@ -108,10 +108,10 @@ export const useAppStore = defineStore('app', () => {
   // 投入指数
   const inputScore = computed(() => calcInputScore(myRecords.value))
 
-  // 本月充值
-  const thisMonth = new Date().toISOString().slice(0, 7)
+  // 本月充值（thisMonth 使用 computed 确保跨月后自动更新）
+  const thisMonth = computed(() => new Date().toISOString().slice(0, 7))
   const monthAmount = computed(() =>
-    myRecords.value.filter(r => r.rechargeDate.startsWith(thisMonth)).reduce((s, r) => s + Number(r.amount), 0)
+    myRecords.value.filter(r => r.rechargeDate.startsWith(thisMonth.value)).reduce((s, r) => s + Number(r.amount), 0)
   )
 
   // 月度趋势（最近6个月）

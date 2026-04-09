@@ -1,103 +1,126 @@
-# 智汇星盘 — AI 效能台账 | H5 版本
+# 智汇星盘 — AI 效能台账
 
-基于 **Vue 3 + Vite + Pinia** 构建的深色毛玻璃风格微信小程序 H5 版本，支持 Vercel 一键部署。
+> Vue 3 + Vite + Pinia H5 版 · 面向企业/团队的 AI 工具使用成本管理系统
 
-## 🎯 功能特性
+[![Vercel Deploy](https://img.shields.io/badge/Vercel-Deploy-black?logo=vercel)](https://vercel.com)
+[![Vue 3](https://img.shields.io/badge/Vue-3.4-42b883?logo=vue.js)](https://vuejs.org)
+[![Vite 5](https://img.shields.io/badge/Vite-5.0-646cff?logo=vite)](https://vitejs.dev)
+
+---
+
+## 功能概览
 
 ### 员工端
-- **我的看板**：投入指数圆环、月度趋势、用途分布
-- **提交记录**：充值平台、大模型、金额、日期、用途标签、截图上传
-- **历史记录**：搜索、详情展示、删除操作
+- **看板 (Dashboard)**：投入指数圆环、本月充值统计、月度趋势柱状图、用途分布排行
+- **填报 (RecordNew)**：AI 平台 / 大模型 / 充值渠道（含第三方省钱渠道）/ 金额 / 用途标签全流程录入；第三方渠道自动计算折扣率、节省金额、ROI 倍率
+- **记录 (Records)**：充值记录列表，支持关键词搜索、删除
 
 ### 管理员端
-- **部门总览**：KPI 卡片、月度趋势、TOP 5 成员排名
-- **成员排名**：全部成员投入指数排序、详情弹窗
-- **趋势分析**：月度表、平台/用途/大模型分布图表
+- **总览 (AdminOverview)**：部门汇总、月度趋势、平台分布、用途分布、大模型分布
+- **成员 (AdminMembers)**：投入指数排名、成员详情弹窗
+- **趋势 (AdminTrends)**：6 个月趋势图表、数据表格、渠道分布
 
-## 🚀 快速开始
+---
 
-### 本地开发
+## 快速开始
 
 ```bash
 # 安装依赖
 npm install
 
-# 启动开发服务器 (http://localhost:5173)
+# 本地开发（默认 http://localhost:5173）
 npm run dev
 
-# 构建生产版本
+# 生产构建
 npm run build
 
-# 预览生产构建
+# 预览构建产物
 npm run preview
 ```
 
-### Vercel 部署
+---
 
-1. 推送代码到 GitHub
-2. 在 Vercel 中导入仓库
-3. 自动检测到 `vercel.json` 配置，一键部署
+## Vercel 部署
 
-## 🎨 设计语言
+| 配置项 | 值 |
+|---|---|
+| Build Command | `vite build` |
+| Output Directory | `dist` |
+| Framework Preset | Vite |
 
-- **配色**：深夜蓝黑 (#0f0c29) + 紫蓝渐变 (#7c3aed → #38bdf8)
-- **风格**：毛玻璃卡片 (Glassmorphism) + 发光边框
-- **字体**：Inter + Noto Sans SC
-- **单位**：px（响应式设计）
+> **注意**：`vercel.json` 已配置 History 路由重写规则（`/(.*) → /index.html`）、静态资源缓存头（`max-age=31536000, immutable`）及安全响应头，无需额外配置。
 
-## 📁 项目结构
+---
+
+## 技术架构
+
+| 层次 | 技术选型 |
+|---|---|
+| 框架 | Vue 3 (Composition API + `<script setup>`) |
+| 构建工具 | Vite 5 + `@vitejs/plugin-vue` |
+| 状态管理 | Pinia 2 |
+| 路由 | Vue Router 4（History 模式） |
+| 样式 | 纯 CSS（CSS 变量 + scoped） |
+| 数据 | Mock 数据（`src/store/app.js`） |
+
+### 构建分包策略
+
+`vite.config.js` 中配置了 `manualChunks`，将 Vue / Vue Router / Pinia 拆分为独立 `vendor-vue` chunk，利用浏览器长效缓存减少重复下载。
+
+---
+
+## 多端适配规范
+
+项目在 `src/assets/main.css` 中定义了以下 CSS 变量，统一管理多端安全区：
+
+```css
+:root {
+  --status-bar-height: 44px;           /* 状态栏高度 */
+  --nav-bar-content-height: 44px;      /* 导航栏内容高度 */
+  --nav-bar-height: calc(...);         /* 导航栏总高度 */
+  --capsule-safe-right: 102px;         /* 微信胶囊安全右边距 */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);  /* 底部安全区 */
+  --tab-bar-height: calc(50px + var(--safe-area-bottom)); /* TabBar 总高度 */
+}
+```
+
+移动端（`max-width: 480px`）下，手机外壳模拟框将自动隐藏，切换为全屏原生布局，底部 TabBar 自动适配 iPhone X+ 系列安全区。
+
+---
+
+## 项目结构
 
 ```
-src/
-├── assets/
-│   └── main.css              # 全局样式 + 深色主题
-├── components/
-│   ├── TabBar.vue            # 底部导航栏
-│   └── Toast.vue             # 提示组件
-├── router/
-│   └── index.js              # 路由配置
-├── store/
-│   └── app.js                # Pinia 全局状态 + Mock 数据
-├── views/
-│   ├── employee/
-│   │   ├── Dashboard.vue     # 员工看板
-│   │   ├── RecordNew.vue     # 填报记录
-│   │   └── Records.vue       # 历史记录
-│   └── admin/
-│       ├── AdminOverview.vue # 部门总览
-│       ├── AdminMembers.vue  # 成员排名
-│       └── AdminTrends.vue   # 趋势分析
-├── App.vue                   # 根组件 + Demo 角色切换
-└── main.js                   # 应用入口
+aimonitor-uniapp/
+├── src/
+│   ├── assets/main.css          # 全局样式 + CSS 变量（含多端适配变量）
+│   ├── components/
+│   │   ├── TabBar.vue           # 底部导航（含 safe-area 适配）
+│   │   └── Toast.vue            # 全局提示组件
+│   ├── router/index.js          # 路由配置（History 模式）
+│   ├── store/app.js             # Pinia Store + Mock 数据 + 投入指数算法
+│   └── views/
+│       ├── employee/            # 员工端页面（Dashboard / RecordNew / Records）
+│       └── admin/               # 管理员端页面（Overview / Members / Trends）
+├── index.html
+├── vite.config.js               # 构建配置（含 vendor 分包策略）
+└── vercel.json                  # Vercel 部署配置（含缓存头、安全头、路由重写）
 ```
 
-## 🔧 配置文件
+---
 
-- **vite.config.js**：Vite 构建配置
-- **vercel.json**：Vercel 部署配置
-- **package.json**：项目依赖和脚本
+## Demo 角色切换
 
-## 📊 Mock 数据
+页面顶部 Demo 工具栏可一键切换**员工视角**与**管理员视角**，路由自动跳转至对应首页。
 
-所有数据均来自 `src/store/app.js` 中的 Mock 层，包括：
-- 5 个虚拟成员
-- 每个成员 6 条充值记录
-- 投入指数算法（金额 + 平台 + 用途）
+---
 
-## 🔐 Demo 模式
+## 后续集成说明
 
-顶部固定条可切换员工/管理员视图，用于快速预览不同角色的界面。
+当前所有数据均来自 `src/store/app.js` 中的 Mock 数据（`genRecords()`）。接入真实后端时，只需将 `records` 的初始化逻辑替换为 API 请求，所有 computed 统计和视图无需改动。
 
-## 📱 响应式设计
+---
 
-- 移动优先设计
-- 支持 iOS/Android 安全区域
-- 底部 TabBar 固定导航
-
-## 🌐 后端对接
-
-当需要对接真实后端时，只需替换 `src/store/app.js` 中的 Mock 数据为 API 调用即可，无需修改组件代码。
-
-## 📄 许可证
+## 许可证
 
 MIT

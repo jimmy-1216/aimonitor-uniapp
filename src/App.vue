@@ -153,6 +153,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -app
   .phone-shell { width: 100vw; height: 100dvh; border-radius: 0; box-shadow: none; }
   .phone-shell::after { display: none; }
   .notch { display: none; }
-  .status-bar { padding-top: env(safe-area-inset-top, 14px); }
+  /* 顶部安全区：小程序内已由微信处理，此处仅应对独立 H5 访问场景 */
+  .status-bar { padding-top: max(env(safe-area-inset-top, 14px), 14px); }
 }
 </style>

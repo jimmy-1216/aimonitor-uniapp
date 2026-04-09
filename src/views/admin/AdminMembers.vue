@@ -57,7 +57,7 @@
             <div class="detail-lbl">记录数量</div>
           </div>
           <div class="detail-cell" style="border-color:rgba(0,255,136,0.2);">
-            <div class="detail-val" style="color:#00ff88;">{{ selected.platforms ?? selected.platformCount ?? 0 }}</div>
+            <div class="detail-val" style="color:#00ff88;">{{ selected.platforms ?? 0 }}</div>
             <div class="detail-lbl">平台数量</div>
           </div>
         </div>
