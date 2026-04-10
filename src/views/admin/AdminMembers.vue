@@ -88,7 +88,7 @@
           </div>
         </div>
 
-        <!-- 投入指数明细 -->
+        <!-- 投入指数明细（V2.4：两个维度，无频次） -->
         <div class="section-label">📥 投入指数明细（50分）<span class="section-role-tag" :style="`color:${selected.jobColor}`">{{ selected.jobLabel }}岗规则</span></div>
         <div class="breakdown-list">
           <div v-for="(dim, key) in inputConfig.input" :key="key" class="breakdown-item">
@@ -101,10 +101,10 @@
           </div>
         </div>
 
-        <!-- 产出指数明细 -->
+        <!-- 产出指数明细（V2.4：dim1自动10分，dim2质量25分，dim3评价15分） -->
         <div class="section-label">📤 产出指数明细（50分）<span class="section-role-tag" :style="`color:${selected.jobColor}`">{{ selected.jobLabel }}岗规则</span></div>
         <div class="breakdown-list">
-          <!-- dim1 自动计算 -->
+          <!-- dim1 自动计算，满分 10 分 -->
           <div class="breakdown-item">
             <div class="breakdown-name">{{ outputConfig.output.dim1.label }}</div>
             <div class="breakdown-desc">自动计算</div>
@@ -113,7 +113,7 @@
             </div>
             <div class="breakdown-score">{{ selected.dim1OutputScore }}<span class="breakdown-max">/{{ outputConfig.output.dim1.max }}</span></div>
           </div>
-          <!-- dim2 管理员打分 -->
+          <!-- dim2 用途说明质量，满分 25 分，管理员打分 -->
           <div class="breakdown-item editable">
             <div class="breakdown-name">{{ outputConfig.output.dim2.label }}</div>
             <div class="breakdown-desc">管理员评分</div>
@@ -125,7 +125,7 @@
               <span class="breakdown-max">/{{ outputConfig.output.dim2.max }}</span>
             </div>
           </div>
-          <!-- dim3 管理员打分 -->
+          <!-- dim3 综合评价，满分 15 分，管理员打分 -->
           <div class="breakdown-item editable">
             <div class="breakdown-name">{{ outputConfig.output.dim3.label }}</div>
             <div class="breakdown-desc">管理员评分</div>
@@ -145,6 +145,11 @@
           <div class="hint-row"><span class="hint-tag">{{ outputConfig.output.dim3.label }}</span> {{ outputConfig.outputHints.dim3 }}</div>
         </div>
 
+        <!-- 绩效挂钩权重说明 -->
+        <div class="perf-weight-hint">
+          📈 绩效挂钩：传统考核（KPI/OKR）<strong>70%</strong> + AI 效能分 <strong>30%</strong>
+        </div>
+
         <!-- 操作按钮 -->
         <div style="display:flex; gap:8px; margin-top:12px;">
           <button class="btn-ghost" style="flex:1; padding:12px;" @click="closeDetail">取消</button>
@@ -157,14 +162,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useAppStore } from '@/store/app'
-import { JOB_ROLES, JOB_SCORE_CONFIG } from '@/store/app'
+import { useAppStore, JOB_ROLES, JOB_SCORE_CONFIG } from '@/store/app'
 
 const store = useAppStore()
 const search = ref('')
 const filterRole = ref('all')
 const selected = ref(null)
-const editOutputQuality = ref(10)
+const editOutputQuality = ref(12)
 const editManagerEval = ref(8)
 
 const filters = [
@@ -189,11 +193,10 @@ const filtered = computed(() => {
 const inputConfig = computed(() => selected.value ? JOB_SCORE_CONFIG[selected.value.jobRole] || JOB_SCORE_CONFIG.general : JOB_SCORE_CONFIG.general)
 const outputConfig = computed(() => inputConfig.value)
 
-// 获取投入指数各维度得分
+// 获取投入指数各维度得分（V2.4：仅 dim1/dim2）
 function getInputDimScore(m, dimKey) {
   if (dimKey === 'dim1') return m.dim1InputScore
   if (dimKey === 'dim2') return m.dim2InputScore
-  if (dimKey === 'dim3') return m.dim3InputScore
   return 0
 }
 
@@ -202,20 +205,19 @@ function getInputBreakdownDesc(m, dimKey) {
   const b = m.breakdown || {}
   const jr = m.jobRole
   if (dimKey === 'dim1') {
-    if (jr === 'dev') return `编程工具 ¥${b.codingAmount ?? 0} / 总 ¥${b.totalAmount ?? 0}`
-    return `¥${b.totalAmount ?? 0}`
+    if (jr === 'dev') return `编程工具 ¥${b.codingAmount ?? 0}（满分≥¥200）`
+    return `充值总额 ¥${b.totalAmount ?? 0}（满分≥¥200）`
   }
   if (dimKey === 'dim2') {
-    if (jr === 'product') return `${b.platformCount ?? 0} 个平台`
-    return `${b.modelCount ?? 0} 个模型`
+    if (jr === 'product') return `${b.platformCount ?? 0} 个平台（满分≥5个）`
+    return `${b.modelCount ?? 0} 个模型（满分≥4个）`
   }
-  if (dimKey === 'dim3') return `${b.recordCount ?? 0} 次充值`
   return ''
 }
 
 function openDetail(m) {
   selected.value = m
-  const ms = store.managerScores[m.id] || { outputQuality: 10, managerEval: 8 }
+  const ms = store.managerScores[m.id] || { outputQuality: 12, managerEval: 8 }
   editOutputQuality.value = ms.outputQuality
   editManagerEval.value = ms.managerEval
 }
@@ -259,6 +261,7 @@ function saveScore() {
 .mc-score-lbl { font-size: 10px; color: #7a95aa; margin-top: 2px; }
 
 /* 详情弹窗 */
+.mp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: flex; align-items: flex-end; }
 .detail-sheet { width: 100%; background: #162438; border: 1px solid rgba(99,179,237,0.28); border-radius: 20px 20px 0 0; padding: 16px 16px 32px; animation: sheet-up 0.25s ease; max-height: 90vh; overflow-y: auto; }
 .detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .detail-avatar { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex-shrink: 0; }
@@ -279,7 +282,7 @@ function saveScore() {
 .section-label { font-size: 11px; font-weight: 700; color: #7a95aa; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 .section-role-tag { font-size: 10px; font-weight: 600; }
 .breakdown-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-.breakdown-item { display: grid; grid-template-columns: 80px 70px 1fr 52px; align-items: center; gap: 6px; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 10px; }
+.breakdown-item { display: grid; grid-template-columns: 80px 90px 1fr 52px; align-items: center; gap: 6px; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 10px; }
 .breakdown-item.editable { border: 1px solid rgba(168,85,247,0.15); }
 .breakdown-name { font-size: 11px; color: #b8cfe0; font-weight: 600; }
 .breakdown-desc { font-size: 10px; color: #7a95aa; }
@@ -288,16 +291,25 @@ function saveScore() {
 .breakdown-score { font-size: 13px; font-weight: 700; color: #e8f4fd; text-align: right; }
 .breakdown-max { font-size: 10px; color: #7a95aa; font-weight: 400; }
 .breakdown-score-edit { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
-.score-input { width: 32px; background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); border-radius: 4px; color: #e8f4fd; font-size: 13px; font-weight: 700; text-align: center; padding: 2px 0; }
+.score-input { width: 34px; background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); border-radius: 4px; color: #e8f4fd; font-size: 13px; font-weight: 700; text-align: center; padding: 2px 0; }
 .score-input:focus { outline: none; border-color: rgba(168,85,247,0.6); }
 
 /* 评分提示 */
-.score-hint { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.12); border-radius: 8px; padding: 8px 10px; margin-bottom: 4px; }
+.score-hint { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.12); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
 .hint-row { font-size: 10px; color: #7a95aa; line-height: 1.8; }
 .hint-tag { color: #8ab0c8; font-weight: 600; margin-right: 4px; }
 
+/* 绩效挂钩权重说明 */
+.perf-weight-hint {
+  font-size: 11px; color: #4a6080;
+  background: rgba(255,214,10,0.04); border: 1px solid rgba(255,214,10,0.12);
+  border-radius: 8px; padding: 7px 10px; margin-bottom: 4px; text-align: center;
+}
+.perf-weight-hint strong { color: #ffd60a; }
+
 /* 按钮 */
 .btn-primary { background: linear-gradient(135deg, #00d4ff, #a855f7); border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-ghost { background: rgba(255,255,255,0.05); border: 1px solid rgba(99,179,237,0.2); border-radius: 10px; color: #8ab0c8; font-size: 14px; font-weight: 600; cursor: pointer; }
 .search-clear { background: none; border: none; color: #8ab0c8; font-size: 14px; cursor: pointer; padding: 0 4px; }
 .search-clear:hover { color: #e8f4fd; }
 

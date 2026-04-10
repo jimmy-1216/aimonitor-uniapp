@@ -3,7 +3,6 @@
 
     <!-- 顶部 Hero 区 -->
     <div class="dash-hero">
-      <!-- 背景光晕 -->
       <div class="hero-glow hero-glow-1"></div>
       <div class="hero-glow hero-glow-2"></div>
 
@@ -13,7 +12,7 @@
           <div>
             <div class="hero-name">{{ store.currentUser.name }}</div>
             <div class="hero-dept">AI 效能台账</div>
-          <div class="hero-job-tag" :style="`background:${jobInfo.color}18; color:${jobInfo.color}; border-color:${jobInfo.color}40`">{{ jobInfo.icon }} {{ jobInfo.label }}岗</div>
+            <div class="hero-job-tag" :style="`background:${jobInfo.color}18; color:${jobInfo.color}; border-color:${jobInfo.color}40`">{{ jobInfo.icon }} {{ jobInfo.label }}岗</div>
           </div>
         </div>
         <div class="hero-badge">
@@ -22,13 +21,19 @@
         </div>
       </div>
 
-      <!-- 核心指标 -->
+      <!-- 核心指标：总分 100 分 -->
       <div class="hero-kpi">
         <div class="kpi-main">
           <div class="kpi-label">AI 效能分</div>
-          <div class="kpi-value">{{ store.inputScore }}<span class="kpi-unit">/50</span></div>
+          <div class="kpi-value">{{ store.totalScore }}<span class="kpi-unit">/100</span></div>
           <div class="kpi-bar">
-            <div class="kpi-bar-fill" :style="{ width: (store.inputScore / 50 * 100) + '%' }"></div>
+            <div class="kpi-bar-fill" :style="{ width: store.totalScore + '%' }"></div>
+          </div>
+          <!-- 投入/产出双维度小标签 -->
+          <div class="kpi-sub-row">
+            <span class="kpi-sub-tag" :style="`color:${jobInfo.color}`">投入 {{ store.inputScore }}/50</span>
+            <span class="kpi-sub-sep">·</span>
+            <span class="kpi-sub-tag" style="color:#a855f7">产出 {{ store.outputScore }}/50</span>
           </div>
         </div>
         <div class="kpi-ring-wrap">
@@ -42,16 +47,23 @@
             <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
             <circle cx="50" cy="50" r="42" fill="none" stroke="url(#ringGrad)" stroke-width="6"
               stroke-linecap="round" stroke-dasharray="264"
-              :stroke-dashoffset="264 - (store.inputScore / 50) * 264"
+              :stroke-dashoffset="264 - (store.totalScore / 100) * 264"
               transform="rotate(-90 50 50)"
               style="filter:drop-shadow(0 0 6px rgba(0,212,255,0.7)); transition: stroke-dashoffset 0.8s ease;"/>
           </svg>
           <div class="ring-center">
-            <div class="ring-num">{{ store.inputScore }}</div>
+            <div class="ring-num">{{ store.totalScore }}</div>
             <div class="ring-sub">分</div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- 填报截止提示 -->
+    <div class="deadline-bar">
+      <span class="deadline-icon">📅</span>
+      <span class="deadline-text">本月记录填报截止：<strong>{{ store.submitDeadline }}</strong></span>
+      <router-link to="/record/new" class="deadline-btn">去填报</router-link>
     </div>
 
     <!-- 三维数据条 -->
@@ -78,6 +90,31 @@
           <div class="stat-val" style="color:#00ff88;">{{ store.myRecords.length }}</div>
           <div class="stat-lbl">记录总数</div>
         </div>
+      </div>
+    </div>
+
+    <!-- 评分双维度进度条 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">效能评分明细</div>
+        <div class="section-badge">满分 100 分</div>
+      </div>
+      <div class="score-breakdown">
+        <div class="score-dim-row">
+          <div class="score-dim-label" :style="`color:${jobInfo.color}`">投入指数</div>
+          <div class="score-dim-bar-wrap">
+            <div class="score-dim-bar" :style="{ width: (store.inputScore / 50 * 100) + '%', background: jobInfo.color }"></div>
+          </div>
+          <div class="score-dim-val" :style="`color:${jobInfo.color}`">{{ store.inputScore }}<span class="score-dim-max">/50</span></div>
+        </div>
+        <div class="score-dim-row">
+          <div class="score-dim-label" style="color:#a855f7">产出指数</div>
+          <div class="score-dim-bar-wrap">
+            <div class="score-dim-bar" :style="{ width: (store.outputScore / 50 * 100) + '%', background: '#a855f7' }"></div>
+          </div>
+          <div class="score-dim-val" style="color:#a855f7">{{ store.outputScore }}<span class="score-dim-max">/50</span></div>
+        </div>
+        <div class="score-weight-hint">绩效挂钩：传统考核 70% + AI 效能分 30%</div>
       </div>
     </div>
 
@@ -190,6 +227,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
   background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.2);
   font-size: 11px; color: #00ff88; font-weight: 600;
 }
+.glow-dot { width: 6px; height: 6px; border-radius: 50%; background: #00ff88; box-shadow: 0 0 6px #00ff88; display: inline-block; }
 
 /* KPI 区 */
 .hero-kpi { display: flex; align-items: center; justify-content: space-between; }
@@ -199,12 +237,32 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .kpi-unit { font-size: 16px; font-weight: 400; color: #6b8099; letter-spacing: 0; }
 .kpi-bar { width: 140px; height: 4px; background: rgba(255,255,255,0.09); border-radius: 2px; margin-top: 10px; overflow: hidden; }
 .kpi-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #00d4ff, #a855f7); box-shadow: 0 0 8px rgba(0,212,255,0.5); transition: width 0.8s ease; }
+.kpi-sub-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.kpi-sub-tag { font-size: 11px; font-weight: 600; }
+.kpi-sub-sep { font-size: 11px; color: #4a5568; }
 
 /* 圆环 */
 .kpi-ring-wrap { position: relative; width: 90px; height: 90px; }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .ring-num { font-size: 22px; font-weight: 800; color: #00d4ff; letter-spacing: -1px; }
 .ring-sub { font-size: 10px; color: #6b8099; }
+
+/* 填报截止提示 */
+.deadline-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255,214,10,0.06);
+  border-bottom: 1px solid rgba(255,214,10,0.15);
+}
+.deadline-icon { font-size: 13px; }
+.deadline-text { flex: 1; font-size: 12px; color: #a8bdd0; }
+.deadline-text strong { color: #ffd60a; }
+.deadline-btn {
+  font-size: 11px; font-weight: 600; color: #ffd60a;
+  padding: 3px 10px; border-radius: 10px;
+  background: rgba(255,214,10,0.1); border: 1px solid rgba(255,214,10,0.3);
+  text-decoration: none;
+}
 
 /* 三维数据条 */
 .stat-row {
@@ -224,10 +282,28 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 .section-title { font-size: 14px; font-weight: 700; color: #edf6ff; letter-spacing: 0.3px; }
 .section-badge { font-size: 10px; color: #6b8099; background: rgba(255,255,255,0.06); border: 1px solid rgba(99,179,237,0.2); padding: 2px 8px; border-radius: 10px; }
 
+/* 评分明细 */
+.score-breakdown {
+  background: #1a2840; border-radius: 12px; border: 1px solid rgba(99,179,237,0.28);
+  padding: 12px 14px; margin-bottom: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.score-dim-row { display: flex; align-items: center; gap: 10px; }
+.score-dim-label { font-size: 12px; font-weight: 600; min-width: 52px; }
+.score-dim-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+.score-dim-bar { height: 100%; border-radius: 3px; transition: width 0.8s ease; box-shadow: 0 0 6px rgba(0,212,255,0.3); }
+.score-dim-val { font-size: 13px; font-weight: 800; min-width: 44px; text-align: right; }
+.score-dim-max { font-size: 10px; font-weight: 400; color: #4a5568; }
+.score-weight-hint {
+  font-size: 10px; color: #4a6080;
+  padding-top: 6px; border-top: 1px solid rgba(99,179,237,0.12);
+  text-align: center; letter-spacing: 0.3px;
+}
+
 /* 趋势图 */
 .trend-chart {
   display: flex; align-items: flex-end; gap: 6px;
-  height: 110px; padding: 0 4px;
+  height: 110px;
   background: #1a2840; border-radius: 12px; border: 1px solid rgba(99,179,237,0.28);
   padding: 12px 12px 8px;
   margin-bottom: 14px;

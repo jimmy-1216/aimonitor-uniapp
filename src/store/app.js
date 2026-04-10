@@ -112,8 +112,16 @@ export const PURPOSE_LABELS = Object.fromEntries(PURPOSE_TAGS.map(t => [t.value,
 
 // ===== 岗位体系 =====
 /**
- * 岗位分类：product（产品/设计）、dev（研发/技术）、general（通用/运营/其他）
- * 每个岗位有独立的投入指数和产出指数权重配置
+ * 岗位分类：dev（研发/技术）、product（产品/设计）、general（通用/运营/其他）
+ *
+ * V2.4 评分规则（对齐《AI时代的绩效考核框架》V2.4）：
+ *   投入指数（50分）= dim1（30分）+ dim2（20分）
+ *   产出指数（50分）= 场景覆盖度（10分，自动）+ 用途说明质量（25分，管理员）+ 综合评价（15分，管理员）
+ *   AI 效能分（100分）= 投入指数 + 产出指数
+ *
+ *   绩效挂钩：传统考核（KPI/OKR）70% + AI 效能分 30%
+ *
+ * 注意：V2.1 版本中的"使用频次"维度已取消，不再计入投入指数。
  */
 export const JOB_ROLES = [
   { value: 'dev',     label: '研发',   icon: '💻', color: '#a855f7', desc: '前端/后端/算法/测试' },
@@ -123,67 +131,63 @@ export const JOB_ROLES = [
 export const JOB_ROLE_LABELS = Object.fromEntries(JOB_ROLES.map(r => [r.value, r.label]))
 
 /**
- * 岗位差异化评分配置
- * 投入指数满分 50 分，产出指数满分 50 分，合计 100 分
+ * 岗位差异化评分配置（V2.4）
  *
  * 研发岗（dev）：
- *   投入：编程类工具使用（20）+ 大模型多样性（15）+ 使用频次（15）= 50
- *   产出：代码/技术场景覆盖（15）+ 技术产出质量（20，管理员）+ 综合评价（15，管理员）= 50
+ *   投入：编程工具投入（30分）+ 大模型多样性（20分）= 50
+ *   产出：技术场景覆盖（10分，自动）+ 技术产出质量（25分，管理员）+ 综合评价（15分，管理员）= 50
  *
  * 产品岗（product）：
- *   投入：充值金额（15）+ 工具多样性（20）+ 使用频次（15）= 50
- *   产出：需求/设计场景覆盖（15）+ 产出物质量（20，管理员）+ 综合评价（15，管理员）= 50
+ *   投入：充值总金额（30分）+ 工具多样性（20分）= 50
+ *   产出：需求/设计场景（10分，自动）+ 产出物质量（25分，管理员）+ 综合评价（15分，管理员）= 50
  *
  * 通用岗（general）：
- *   投入：充值金额（20）+ 大模型多样性（15）+ 使用频次（15）= 50
- *   产出：场景多样性（15）+ 用途说明质量（20，管理员）+ 综合评价（15，管理员）= 50
+ *   投入：充值总金额（30分）+ 大模型多样性（20分）= 50
+ *   产出：场景多样性（10分，自动）+ 用途说明质量（25分，管理员）+ 综合评价（15分，管理员）= 50
  */
 export const JOB_SCORE_CONFIG = {
   dev: {
     input: {
-      dim1: { key: 'codingTools', label: '编程工具投入', max: 20, hint: '使用 Cursor/Copilot/Codex 等编程 AI 的金额占比' },
-      dim2: { key: 'modelDiversity', label: '大模型多样性', max: 15, hint: '调用不同底层大模型的数量' },
-      dim3: { key: 'frequency', label: '使用频次', max: 15, hint: '近30天充值记录次数' },
+      dim1: { key: 'codingTools', label: '编程工具投入', max: 30, hint: '编程 AI 工具（Cursor/Copilot/Windsurf 等）充值金额 ≥¥200 得满分' },
+      dim2: { key: 'modelDiversity', label: '大模型多样性', max: 20, hint: '调用不同底层大模型的数量，≥4 个得满分' },
     },
     output: {
-      dim1: { key: 'techScene', label: '技术场景覆盖', max: 15, hint: '编程/Agent/分析等技术类用途标签数量' },
-      dim2: { key: 'outputQuality', label: '技术产出质量', max: 20, hint: '管理员评分：代码质量、效率提升、技术方案完整度' },
+      dim1: { key: 'techScene', label: '技术场景覆盖', max: 10, hint: '编程/Agent/分析等技术类用途标签，≥3 种得满分' },
+      dim2: { key: 'outputQuality', label: '技术产出质量', max: 25, hint: '管理员评分：代码质量、效率提升、技术方案完整度' },
       dim3: { key: 'managerEval', label: '综合评价', max: 15, hint: '管理员综合评价' },
     },
     outputHints: {
-      dim2: '优秀18-20 · 良好12-17 · 一般6-11 · 较差1-5',
+      dim2: '优秀22-25 · 良好15-21 · 一般8-14 · 较差1-7',
       dim3: '优秀13-15 · 良好9-12 · 一般5-8 · 待改进1-4',
     },
   },
   product: {
     input: {
-      dim1: { key: 'amount', label: '充值金额', max: 15, hint: '近30天 AI 工具充值总额' },
-      dim2: { key: 'toolDiversity', label: '工具多样性', max: 20, hint: '使用不同 AI 工具平台的数量（产品岗更强调广度）' },
-      dim3: { key: 'frequency', label: '使用频次', max: 15, hint: '近30天充值记录次数' },
+      dim1: { key: 'amount', label: '充值总金额', max: 30, hint: '月度 AI 工具总投入 ≥¥200 得满分' },
+      dim2: { key: 'toolDiversity', label: '工具多样性', max: 20, hint: '使用不同 AI 平台数量，≥5 个得满分（产品岗强调广度）' },
     },
     output: {
-      dim1: { key: 'designScene', label: '需求/设计场景', max: 15, hint: '文案/设计/调研/PPT 等产品类用途标签数量' },
-      dim2: { key: 'outputQuality', label: '产出物质量', max: 20, hint: '管理员评分：PRD 完整度、设计稿质量、用户洞察深度' },
+      dim1: { key: 'designScene', label: '需求/设计场景', max: 10, hint: '文案/设计/调研/PPT 等业务类用途标签，≥3 种得满分' },
+      dim2: { key: 'outputQuality', label: '产出物质量', max: 25, hint: '管理员评分：PRD 完整度、设计稿质量、用户洞察深度' },
       dim3: { key: 'managerEval', label: '综合评价', max: 15, hint: '管理员综合评价' },
     },
     outputHints: {
-      dim2: '优秀18-20 · 良好12-17 · 一般6-11 · 较差1-5',
+      dim2: '优秀22-25 · 良好15-21 · 一般8-14 · 较差1-7',
       dim3: '优秀13-15 · 良好9-12 · 一般5-8 · 待改进1-4',
     },
   },
   general: {
     input: {
-      dim1: { key: 'amount', label: '充值金额', max: 20, hint: '近30天 AI 工具充值总额' },
-      dim2: { key: 'modelDiversity', label: '大模型多样性', max: 15, hint: '调用不同底层大模型的数量' },
-      dim3: { key: 'frequency', label: '使用频次', max: 15, hint: '近30天充值记录次数' },
+      dim1: { key: 'amount', label: '充值总金额', max: 30, hint: '月度 AI 工具总投入 ≥¥200 得满分' },
+      dim2: { key: 'modelDiversity', label: '大模型多样性', max: 20, hint: '调用不同底层大模型的数量，≥4 个得满分' },
     },
     output: {
-      dim1: { key: 'sceneDiv', label: '场景多样性', max: 15, hint: '使用 AI 的不同用途标签数量' },
-      dim2: { key: 'outputQuality', label: '用途说明质量', max: 20, hint: '管理员评分：说明是否清晰、是否与业务结合' },
+      dim1: { key: 'sceneDiv', label: '场景多样性', max: 10, hint: '使用 AI 的不同用途标签，≥4 种得满分' },
+      dim2: { key: 'outputQuality', label: '用途说明质量', max: 25, hint: '管理员评分：说明是否具体量化、是否与业务结合' },
       dim3: { key: 'managerEval', label: '综合评价', max: 15, hint: '管理员综合评价' },
     },
     outputHints: {
-      dim2: '优秀18-20 · 良好12-17 · 一般6-11 · 较差1-5',
+      dim2: '优秀22-25 · 良好15-21 · 一般8-14 · 较差1-7',
       dim3: '优秀13-15 · 良好9-12 · 一般5-8 · 待改进1-4',
     },
   },
@@ -196,144 +200,161 @@ const PRODUCT_PURPOSE_TAGS = new Set(['writing', 'design', 'research', 'ppt', 'i
 // 研发岗关注的用途标签
 const DEV_PURPOSE_TAGS = new Set(['coding', 'agent', 'analysis'])
 
-// ===== 评分函数 =====
+// ===== 评分函数（V2.4）=====
 
-/** 充值金额得分（通用/产品岗 dim1） */
-function scoreAmount(amount, max) {
-  // max=20（通用）或 max=15（产品）
-  const ratio = max / 20
-  if (amount >= 200) return max
-  if (amount >= 100) return Math.round(15 * ratio)
-  if (amount >= 50)  return Math.round(10 * ratio)
-  if (amount >= 20)  return Math.round(5 * ratio)
-  if (amount >= 1)   return Math.round(2 * ratio)
+/**
+ * 充值金额得分（产品岗/通用岗 dim1，满分30分）
+ * 统一阈值：≥¥200 满分，后期可调整
+ */
+function scoreAmount(amount) {
+  if (amount >= 200) return 30
+  if (amount >= 100) return 20
+  if (amount >= 50)  return 10
+  if (amount >= 1)   return 5
   return 0
 }
 
-/** 编程工具投入得分（研发岗 dim1，满分20） */
+/**
+ * 编程工具投入得分（研发岗 dim1，满分30分）
+ * 考察编程 AI 工具充值金额，≥¥200 满分
+ */
 function scoreCodingTools(records) {
-  const codingAmount = records.filter(r => CODING_PLATFORMS.has(r.platform)).reduce((s, r) => s + Number(r.amount), 0)
-  const total = records.reduce((s, r) => s + Number(r.amount), 0)
-  if (total === 0) return 0
-  const ratio = codingAmount / total
-  if (ratio >= 0.7) return 20
-  if (ratio >= 0.5) return 16
-  if (ratio >= 0.3) return 12
-  if (ratio >= 0.1) return 7
-  if (codingAmount > 0) return 3
+  const codingAmount = records
+    .filter(r => CODING_PLATFORMS.has(r.platform))
+    .reduce((s, r) => s + Number(r.amount), 0)
+  if (codingAmount >= 200) return 30
+  if (codingAmount >= 120) return 22
+  if (codingAmount >= 70)  return 14
+  if (codingAmount >= 1)   return 6
   return 0
 }
 
-/** 大模型多样性得分（满分15） */
+/**
+ * 大模型多样性得分（研发岗/通用岗 dim2，满分20分）
+ * ≥4 个模型满分
+ */
 function scoreModelDiversity(records) {
   const count = new Set(records.map(r => r.llmModel).filter(Boolean)).size
-  if (count >= 4) return 15
-  if (count === 3) return 12
-  if (count === 2) return 8
-  if (count === 1) return 4
+  if (count >= 4) return 20
+  if (count === 3) return 15
+  if (count === 2) return 10
+  if (count === 1) return 5
   return 0
 }
 
-/** 工具多样性得分（产品岗 dim2，满分20，鼓励广度） */
+/**
+ * 工具多样性得分（产品岗 dim2，满分20分，鼓励广度）
+ * ≥5 个平台满分
+ */
 function scoreToolDiversity(records) {
   const count = new Set(records.map(r => r.platform)).size
   if (count >= 5) return 20
   if (count === 4) return 16
   if (count === 3) return 12
-  if (count === 2) return 7
-  if (count === 1) return 3
-  return 0
-}
-
-/** 使用频次得分（满分15） */
-function scoreFrequency(count) {
-  if (count >= 5) return 15
-  if (count >= 3) return 12
-  if (count === 2) return 8
-  if (count === 1) return 4
-  return 0
-}
-
-/** 场景多样性得分（通用岗，满分15） */
-function scoreSceneDiversity(records) {
-  const count = new Set(records.flatMap(r => r.purposeTags)).size
-  if (count >= 4) return 15
-  if (count === 3) return 12
-  if (count === 2) return 8
-  if (count === 1) return 4
-  return 0
-}
-
-/** 技术场景覆盖得分（研发岗 output dim1，满分15） */
-function scoreTechScene(records) {
-  const count = new Set(records.flatMap(r => r.purposeTags).filter(t => DEV_PURPOSE_TAGS.has(t))).size
-  if (count >= 3) return 15
-  if (count === 2) return 11
-  if (count === 1) return 6
-  return 0
-}
-
-/** 需求/设计场景覆盖得分（产品岗 output dim1，满分15） */
-function scoreDesignScene(records) {
-  const count = new Set(records.flatMap(r => r.purposeTags).filter(t => PRODUCT_PURPOSE_TAGS.has(t))).size
-  if (count >= 4) return 15
-  if (count === 3) return 12
   if (count === 2) return 8
   if (count === 1) return 4
   return 0
 }
 
 /**
- * 按岗位计算投入指数（满分50分）
+ * 场景多样性得分（通用岗 output dim1，满分10分）
+ * ≥4 种标签满分
+ */
+function scoreSceneDiversity(records) {
+  const count = new Set(records.flatMap(r => r.purposeTags)).size
+  if (count >= 4) return 10
+  if (count === 3) return 7
+  if (count === 2) return 4
+  if (count === 1) return 2
+  return 0
+}
+
+/**
+ * 技术场景覆盖得分（研发岗 output dim1，满分10分）
+ * ≥3 种技术标签满分
+ */
+function scoreTechScene(records) {
+  const count = new Set(
+    records.flatMap(r => r.purposeTags).filter(t => DEV_PURPOSE_TAGS.has(t))
+  ).size
+  if (count >= 3) return 10
+  if (count === 2) return 6
+  if (count === 1) return 3
+  return 0
+}
+
+/**
+ * 需求/设计场景覆盖得分（产品岗 output dim1，满分10分）
+ * ≥3 种业务标签满分
+ */
+function scoreDesignScene(records) {
+  const count = new Set(
+    records.flatMap(r => r.purposeTags).filter(t => PRODUCT_PURPOSE_TAGS.has(t))
+  ).size
+  if (count >= 3) return 10
+  if (count === 2) return 6
+  if (count === 1) return 3
+  return 0
+}
+
+/**
+ * 按岗位计算投入指数（满分50分，V2.4：仅两个维度，无频次）
  * @param {Array} records - 近30天充值记录
  * @param {string} jobRole - 'dev' | 'product' | 'general'
  */
 export function calcInputScoreByRole(records, jobRole = 'general') {
   if (!records || records.length === 0) {
-    return { dim1Score: 0, dim2Score: 0, dim3Score: 0, inputTotal: 0, breakdown: {} }
+    return { dim1Score: 0, dim2Score: 0, inputTotal: 0, breakdown: {} }
   }
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
   const recent = records.filter(r => new Date(r.rechargeDate) >= thirtyDaysAgo)
   const totalAmount = recent.reduce((s, r) => s + Number(r.amount), 0)
-  const recordCount = recent.length
 
-  let dim1Score = 0, dim2Score = 0, dim3Score = 0
+  let dim1Score = 0, dim2Score = 0
   let breakdown = {}
 
   if (jobRole === 'dev') {
     dim1Score = scoreCodingTools(recent)
     dim2Score = scoreModelDiversity(recent)
-    dim3Score = scoreFrequency(recordCount)
-    const codingAmount = recent.filter(r => CODING_PLATFORMS.has(r.platform)).reduce((s, r) => s + Number(r.amount), 0)
-    breakdown = { codingAmount, totalAmount, modelCount: new Set(recent.map(r => r.llmModel).filter(Boolean)).size, recordCount }
+    const codingAmount = recent
+      .filter(r => CODING_PLATFORMS.has(r.platform))
+      .reduce((s, r) => s + Number(r.amount), 0)
+    breakdown = {
+      codingAmount,
+      totalAmount,
+      modelCount: new Set(recent.map(r => r.llmModel).filter(Boolean)).size,
+    }
   } else if (jobRole === 'product') {
-    dim1Score = scoreAmount(totalAmount, 15)
+    dim1Score = scoreAmount(totalAmount)
     dim2Score = scoreToolDiversity(recent)
-    dim3Score = scoreFrequency(recordCount)
-    breakdown = { totalAmount, platformCount: new Set(recent.map(r => r.platform)).size, recordCount }
+    breakdown = {
+      totalAmount,
+      platformCount: new Set(recent.map(r => r.platform)).size,
+    }
   } else {
     // general
-    dim1Score = scoreAmount(totalAmount, 20)
+    dim1Score = scoreAmount(totalAmount)
     dim2Score = scoreModelDiversity(recent)
-    dim3Score = scoreFrequency(recordCount)
-    breakdown = { totalAmount, modelCount: new Set(recent.map(r => r.llmModel).filter(Boolean)).size, recordCount }
+    breakdown = {
+      totalAmount,
+      modelCount: new Set(recent.map(r => r.llmModel).filter(Boolean)).size,
+    }
   }
 
   return {
     dim1Score,
     dim2Score,
-    dim3Score,
-    inputTotal: dim1Score + dim2Score + dim3Score,
+    inputTotal: dim1Score + dim2Score,
     breakdown,
   }
 }
 
 /**
- * 按岗位计算产出指数（满分50分）
- * dim1 自动计算，dim2/dim3 由管理员打分
+ * 按岗位计算产出指数（满分50分，V2.4）
+ * dim1 自动计算（10分），dim2 用途说明质量（25分，管理员），dim3 综合评价（15分，管理员）
  */
-export function calcOutputScoreByRole(records, jobRole = 'general', outputQuality = 10, managerEval = 8) {
+export function calcOutputScoreByRole(records, jobRole = 'general', outputQuality = 12, managerEval = 8) {
   if (!records || records.length === 0) {
     return { dim1Score: 0, dim2Score: 0, dim3Score: 0, outputTotal: 0 }
   }
@@ -350,7 +371,8 @@ export function calcOutputScoreByRole(records, jobRole = 'general', outputQualit
     dim1Score = scoreSceneDiversity(recent)
   }
 
-  const safeQuality = Math.min(Math.max(Number(outputQuality) || 0, 0), 20)
+  // 管理员打分上限：用途说明质量 25 分，综合评价 15 分
+  const safeQuality = Math.min(Math.max(Number(outputQuality) || 0, 0), 25)
   const safeEval = Math.min(Math.max(Number(managerEval) || 0, 0), 15)
 
   return {
@@ -373,7 +395,6 @@ const MOCK_MEMBERS = [
 function genRecords() {
   const list = []
   let id = 1
-  // 研发岗偏向编程平台，产品岗偏向效率工具，通用岗混合
   const platformsByRole = {
     dev:     ['Cursor', 'GitHub Copilot', 'ChatGPT', 'Claude', 'Windsurf', 'Codex', 'DeepSeek', 'Gemini'],
     product: ['ChatGPT', 'Midjourney', 'Gamma', 'Notion AI', 'Kimi', 'Monica', 'Runway', 'Claude'],
@@ -381,7 +402,6 @@ function genRecords() {
   }
   const models = ['GPT-4o', 'Claude 3.5', 'Gemini 1.5', 'Moonshot', 'DeepSeek-V3', 'Claude 3.7', 'GPT-4o mini', 'DeepSeek-R1']
   const types = ['subscription', 'topup', 'api', 'credits']
-  // 研发岗偏技术标签，产品岗偏设计标签
   const tagsByRole = {
     dev:     [['coding','agent'],['coding','analysis'],['agent','coding'],['coding','translation'],['analysis','coding'],['coding','other'],['agent','analysis'],['coding','research']],
     product: [['writing','ppt'],['design','image'],['research','writing'],['ppt','translation'],['design','writing'],['image','video'],['writing','research'],['design','ppt']],
@@ -431,13 +451,13 @@ export const useAppStore = defineStore('app', () => {
   const records = ref([...ALL_RECORDS])
 
   // 管理员对每个成员的产出指数手动打分
-  // 格式：{ [userId]: { outputQuality: 0-20, managerEval: 0-15 } }
+  // V2.4：用途说明质量上限 25 分，综合评价上限 15 分
   const managerScores = ref({
-    1: { outputQuality: 17, managerEval: 13 },  // 张伟（研发）- 优秀
-    2: { outputQuality: 14, managerEval: 11 },  // 李娜（产品）- 良好
+    1: { outputQuality: 22, managerEval: 13 },  // 张伟（研发）- 优秀
+    2: { outputQuality: 20, managerEval: 11 },  // 李娜（产品）- 良好
     3: { outputQuality: 9,  managerEval: 7  },  // 王芳（通用）- 一般
-    4: { outputQuality: 12, managerEval: 10 },  // 刘洋（研发）- 良好
-    5: { outputQuality: 6,  managerEval: 5  },  // 陈静（产品）- 待改进
+    4: { outputQuality: 16, managerEval: 10 },  // 刘洋（研发）- 良好
+    5: { outputQuality: 8,  managerEval: 5  },  // 陈静（产品）- 待改进
   })
 
   const myRecords = computed(() =>
@@ -447,10 +467,25 @@ export const useAppStore = defineStore('app', () => {
   const inputScoreDetail = computed(() => calcInputScoreByRole(myRecords.value, currentUser.value.jobRole))
   const inputScore = computed(() => inputScoreDetail.value.inputTotal)
 
+  // 当前用户的产出指数（使用管理员打分）
+  const outputScoreDetail = computed(() => {
+    const ms = managerScores.value[currentUser.value.id] || { outputQuality: 12, managerEval: 8 }
+    return calcOutputScoreByRole(myRecords.value, currentUser.value.jobRole, ms.outputQuality, ms.managerEval)
+  })
+  const outputScore = computed(() => outputScoreDetail.value.outputTotal)
+  const totalScore = computed(() => inputScore.value + outputScore.value)
+
   const thisMonth = computed(() => new Date().toISOString().slice(0, 7))
   const monthAmount = computed(() =>
     myRecords.value.filter(r => r.rechargeDate.startsWith(thisMonth.value)).reduce((s, r) => s + Number(r.amount), 0)
   )
+
+  // 填报截止日：次月5号
+  const submitDeadline = computed(() => {
+    const now = new Date()
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 5)
+    return `${nextMonth.getMonth() + 1}月${nextMonth.getDate()}日`
+  })
 
   const monthlyTrend = computed(() => {
     const months = []
@@ -491,7 +526,7 @@ export const useAppStore = defineStore('app', () => {
   const memberStats = computed(() => {
     return MOCK_MEMBERS.map(m => {
       const mrs = records.value.filter(r => r.userId === m.id)
-      const ms = managerScores.value[m.id] || { outputQuality: 10, managerEval: 8 }
+      const ms = managerScores.value[m.id] || { outputQuality: 12, managerEval: 8 }
       const jr = m.jobRole || 'general'
       const input = calcInputScoreByRole(mrs, jr)
       const output = calcOutputScoreByRole(mrs, jr, ms.outputQuality, ms.managerEval)
@@ -505,10 +540,9 @@ export const useAppStore = defineStore('app', () => {
         jobLabel: jobInfo.label,
         jobIcon: jobInfo.icon,
         jobColor: jobInfo.color,
-        // 投入指数明细
+        // 投入指数明细（V2.4：两个维度）
         dim1InputScore: input.dim1Score,
         dim2InputScore: input.dim2Score,
-        dim3InputScore: input.dim3Score,
         inputTotal: input.inputTotal,
         // 产出指数明细
         dim1OutputScore: output.dim1Score,
@@ -523,7 +557,6 @@ export const useAppStore = defineStore('app', () => {
         // 兼容旧字段
         amountScore: input.dim1Score,
         modelScore: input.dim2Score,
-        freqScore: input.dim3Score,
         sceneScore: output.dim1Score,
         descScore: output.dim2Score,
         managerEvalScore: output.dim3Score,
@@ -539,7 +572,7 @@ export const useAppStore = defineStore('app', () => {
 
   function updateManagerScore(userId, outputQuality, managerEval) {
     managerScores.value[userId] = {
-      outputQuality: Math.min(Math.max(Number(outputQuality) || 0, 0), 20),
+      outputQuality: Math.min(Math.max(Number(outputQuality) || 0, 0), 25),
       managerEval: Math.min(Math.max(Number(managerEval) || 0, 0), 15),
     }
   }
@@ -611,7 +644,9 @@ export const useAppStore = defineStore('app', () => {
   return {
     currentUser, records, managerScores,
     myRecords, inputScore, inputScoreDetail,
+    outputScore, outputScoreDetail, totalScore,
     thisMonth, monthAmount, monthlyTrend, purposeDist, categoryStats,
+    submitDeadline,
     allRecords, memberStats, deptTotal, deptAvgScore,
     deptMonthlyTrend, platformStats, purposeStats, modelStats, channelStats,
     addRecord, deleteRecord, updateManagerScore,
