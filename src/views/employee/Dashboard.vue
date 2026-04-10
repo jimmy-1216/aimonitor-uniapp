@@ -13,6 +13,7 @@
           <div>
             <div class="hero-name">{{ store.currentUser.name }}</div>
             <div class="hero-dept">AI 效能台账</div>
+          <div class="hero-job-tag" :style="`background:${jobInfo.color}18; color:${jobInfo.color}; border-color:${jobInfo.color}40`">{{ jobInfo.icon }} {{ jobInfo.label }}岗</div>
           </div>
         </div>
         <div class="hero-badge">
@@ -141,9 +142,10 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useAppStore } from '@/store/app'
+import { useAppStore, JOB_ROLES } from '@/store/app'
 
 const store = useAppStore()
+const jobInfo = computed(() => JOB_ROLES.find(r => r.value === store.currentUser.jobRole) || JOB_ROLES[2])
 const purposeColors = [
   'linear-gradient(90deg,#00d4ff,#0099cc)',
   'linear-gradient(90deg,#a855f7,#7c3aed)',
@@ -181,6 +183,7 @@ const maxTrend = computed(() => Math.max(...store.monthlyTrend.map(t => t.amount
 }
 .hero-name { font-size: 15px; font-weight: 700; color: #edf6ff; }
 .hero-dept { font-size: 11px; color: #6b8099; margin-top: 2px; }
+.hero-job-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 10px; border: 1px solid; margin-top: 3px; }
 .hero-badge {
   display: flex; align-items: center; gap: 5px;
   padding: 4px 10px; border-radius: 20px;
