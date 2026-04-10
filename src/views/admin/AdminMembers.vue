@@ -82,36 +82,36 @@ const filtered = computed(() => {
 <style scoped>
 .member-card {
   display: flex; align-items: center; gap: 10px;
-  background: #111827; border: 1px solid rgba(99,179,237,0.1);
+  background: #1a2840; border: 1px solid rgba(99,179,237,0.28);
   border-radius: 12px; padding: 12px; cursor: pointer;
-  transition: border-color 0.15s; position: relative; overflow: hidden;
+  transition: border-color 0.15s, transform 0.1s; position: relative; overflow: hidden;
 }
 .member-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,0.2), transparent); }
-.member-card:active { border-color: rgba(0,212,255,0.3); }
+.member-card:active { border-color: rgba(0,212,255,0.5); transform: scale(0.99); }
 .mc-rank-badge { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
 .rb-0 { background: rgba(255,214,10,0.1); }
 .rb-1 { background: rgba(148,163,184,0.1); }
 .rb-2 { background: rgba(180,120,60,0.1); }
-.rb-3 { background: rgba(99,179,237,0.06); color: #4a5568; font-size: 11px; font-weight: 700; }
+.rb-3 { background: rgba(99,179,237,0.08); color: #7a95aa; font-size: 11px; font-weight: 700; }
 .mc-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(168,85,247,0.2)); border: 1px solid rgba(0,212,255,0.25); display: flex; align-items: center; justify-content: center; color: #00d4ff; font-weight: 700; font-size: 14px; flex-shrink: 0; }
 .mc-info { flex: 1; min-width: 0; }
 .mc-name { font-size: 13px; font-weight: 600; color: #e8f4fd; }
-.mc-meta { font-size: 11px; color: #4a5568; margin-top: 2px; }
-.mc-bar { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.mc-meta { font-size: 11px; color: #7a95aa; margin-top: 2px; }
+.mc-bar { height: 3px; background: rgba(255,255,255,0.10); border-radius: 2px; margin-top: 6px; overflow: hidden; }
 .mc-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
 .mc-score { text-align: right; flex-shrink: 0; }
 .mc-score-val { font-size: 20px; font-weight: 800; line-height: 1; }
-.mc-score-lbl { font-size: 10px; color: #4a5568; margin-top: 2px; }
+.mc-score-lbl { font-size: 10px; color: #7a95aa; margin-top: 2px; }
 
-.detail-sheet { width: 100%; background: #111827; border: 1px solid rgba(99,179,237,0.15); border-radius: 20px 20px 0 0; padding: 20px 16px 24px; animation: sheet-up 0.25s ease; }
+.detail-sheet { width: 100%; background: #162438; border: 1px solid rgba(99,179,237,0.28); border-radius: 20px 20px 0 0; padding: 12px 16px 32px; animation: sheet-up 0.25s ease; }
 .detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .detail-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, rgba(0,212,255,0.25), rgba(168,85,247,0.25)); border: 1px solid rgba(0,212,255,0.4); display: flex; align-items: center; justify-content: center; color: #00d4ff; font-weight: 700; font-size: 18px; flex-shrink: 0; }
 .detail-name { font-size: 16px; font-weight: 700; color: #e8f4fd; }
-.detail-sub { font-size: 12px; color: #4a5568; margin-top: 2px; }
-.detail-close { margin-left: auto; background: none; border: none; font-size: 18px; color: #4a5568; cursor: pointer; }
+.detail-sub { font-size: 12px; color: #7a95aa; margin-top: 2px; }
+.detail-close { margin-left: auto; background: rgba(255,255,255,0.06); border: 1px solid rgba(99,179,237,0.2); border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #8ab0c8; cursor: pointer; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-.detail-cell { background: rgba(255,255,255,0.03); border: 1px solid; border-radius: 10px; padding: 12px; text-align: center; }
+.detail-cell { background: rgba(255,255,255,0.06); border: 1px solid; border-radius: 10px; padding: 12px; text-align: center; }
 .detail-val { font-size: 22px; font-weight: 800; line-height: 1; }
-.detail-lbl { font-size: 11px; color: #4a5568; margin-top: 4px; }
+.detail-lbl { font-size: 11px; color: #7a95aa; margin-top: 4px; }
 @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 </style>

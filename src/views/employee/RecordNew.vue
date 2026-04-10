@@ -10,42 +10,78 @@
 
     <div style="padding: 12px 0 32px; display:flex; flex-direction:column; gap:10px;">
 
-      <!-- ① AI 平台（分类展示） -->
+      <!-- ① AI 平台（分类展示，可折叠） -->
       <div class="form-block">
-        <div class="form-block-title">AI 平台 <span class="req">*</span></div>
-        <div v-for="cat in PLATFORM_CATEGORIES" :key="cat.key" class="plat-category">
-          <div class="plat-cat-header">
-            <span class="plat-cat-icon">{{ cat.icon }}</span>
-            <span class="plat-cat-label" :style="{ color: cat.color }">{{ cat.label }}</span>
-          </div>
-          <div class="plat-grid">
-            <div
-              v-for="p in cat.platforms" :key="p.value"
-              class="plat-item"
-              :class="{ active: form.platform === p.value }"
-              :style="form.platform === p.value ? { borderColor: cat.color, boxShadow: `0 0 10px ${cat.color}30` } : {}"
-              @click="form.platform = p.value; form.customPlatform = ''"
-            >
-              <span class="plat-item-icon">{{ p.icon }}</span>
-              <span class="plat-item-name" :style="form.platform === p.value ? { color: cat.color } : {}">{{ p.label }}</span>
-              <span class="plat-item-vendor">{{ p.vendor }}</span>
+        <div class="form-block-title" style="display:flex; align-items:center; justify-content:space-between;">
+          <span>AI 平台 <span class="req">*</span></span>
+          <button class="plat-toggle-btn" @click="platExpanded = !platExpanded">
+            {{ platExpanded ? '收起 ▲' : '展开全部 ▼' }}
+          </button>
+        </div>
+
+        <!-- 已选平台预览（折叠时显示） -->
+        <div v-if="!platExpanded" class="plat-selected-preview">
+          <template v-if="form.platform && form.platform !== '其他'">
+            <div class="plat-selected-card" :style="{ borderColor: selectedCatColor }">
+              <span class="plat-item-icon" style="font-size:20px;">{{ selectedPlatInfo?.icon }}</span>
+              <div>
+                <div style="font-size:13px; font-weight:700; color:#f0f8ff;">{{ selectedPlatInfo?.label }}</div>
+                <div style="font-size:10px; color:#7a95aa;">{{ selectedPlatInfo?.vendor }}</div>
+              </div>
+              <div class="plat-selected-cat" :style="{ color: selectedCatColor, borderColor: selectedCatColor + '40', background: selectedCatColor + '15' }">{{ selectedCatLabel }}</div>
+            </div>
+          </template>
+          <template v-else-if="form.platform === '其他'">
+            <div class="plat-selected-card" style="border-color: rgba(148,163,184,0.4);">
+              <span class="plat-item-icon" style="font-size:20px;">➕</span>
+              <div>
+                <div style="font-size:13px; font-weight:700; color:#f0f8ff;">其他平台</div>
+                <div style="font-size:10px; color:#7a95aa;">自定义</div>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="plat-empty-hint">点击「展开全部」选择 AI 平台</div>
+          </template>
+        </div>
+
+        <!-- 展开后的完整列表 -->
+        <template v-if="platExpanded">
+          <div v-for="cat in PLATFORM_CATEGORIES" :key="cat.key" class="plat-category">
+            <div class="plat-cat-header">
+              <span class="plat-cat-icon">{{ cat.icon }}</span>
+              <span class="plat-cat-label" :style="{ color: cat.color }">{{ cat.label }}</span>
+            </div>
+            <div class="plat-grid">
+              <div
+                v-for="p in cat.platforms" :key="p.value"
+                class="plat-item"
+                :class="{ active: form.platform === p.value }"
+                :style="form.platform === p.value ? { borderColor: cat.color, boxShadow: `0 0 10px ${cat.color}30` } : {}"
+                @click="form.platform = p.value; form.customPlatform = ''; platExpanded = false"
+              >
+                <span class="plat-item-icon">{{ p.icon }}</span>
+                <span class="plat-item-name" :style="form.platform === p.value ? { color: cat.color } : {}">{{ p.label }}</span>
+                <span class="plat-item-vendor">{{ p.vendor }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <!-- 其他 -->
-        <div class="plat-category">
-          <div class="plat-grid">
-            <div
-              class="plat-item"
-              :class="{ active: form.platform === '其他' }"
-              @click="form.platform = '其他'"
-            >
-              <span class="plat-item-icon">➕</span>
-              <span class="plat-item-name" :style="form.platform === '其他' ? { color: '#94a3b8' } : {}">其他</span>
-              <span class="plat-item-vendor">自定义</span>
+          <!-- 其他 -->
+          <div class="plat-category">
+            <div class="plat-grid">
+              <div
+                class="plat-item"
+                :class="{ active: form.platform === '其他' }"
+                @click="form.platform = '其他'; platExpanded = false"
+              >
+                <span class="plat-item-icon">➕</span>
+                <span class="plat-item-name" :style="form.platform === '其他' ? { color: '#94a3b8' } : {}">其他</span>
+                <span class="plat-item-vendor">自定义</span>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
+
         <input v-if="form.platform === '其他'" v-model="form.customPlatform" class="form-input" placeholder="请输入平台名称" style="margin-top:10px;" />
       </div>
 
@@ -178,6 +214,32 @@ import { useAppStore, PLATFORM_CATEGORIES, LLM_MODELS, RECHARGE_TYPES, RECHARGE_
 const router = useRouter()
 const store = useAppStore()
 const loading = ref(false)
+
+const platExpanded = ref(false)
+
+// 已选平台信息
+const selectedPlatInfo = computed(() => {
+  if (!form.value.platform || form.value.platform === '其他') return null
+  for (const cat of PLATFORM_CATEGORIES) {
+    const p = cat.platforms.find(p => p.value === form.value.platform)
+    if (p) return p
+  }
+  return null
+})
+const selectedCatColor = computed(() => {
+  if (!form.value.platform || form.value.platform === '其他') return '#94a3b8'
+  for (const cat of PLATFORM_CATEGORIES) {
+    if (cat.platforms.some(p => p.value === form.value.platform)) return cat.color
+  }
+  return '#94a3b8'
+})
+const selectedCatLabel = computed(() => {
+  if (!form.value.platform || form.value.platform === '其他') return ''
+  for (const cat of PLATFORM_CATEGORIES) {
+    if (cat.platforms.some(p => p.value === form.value.platform)) return cat.label
+  }
+  return ''
+})
 
 const form = ref({
   platform: PLATFORM_CATEGORIES[0].platforms[0].value,
@@ -383,4 +445,43 @@ function submit() {
   border-radius: 14px;
 }
 .form-row-label { font-size: 14px; color: #b0c4d8; }
+
+/* 平台折叠按钮 */
+.plat-toggle-btn {
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.25);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px; color: #00d4ff;
+  cursor: pointer; font-weight: 600;
+  transition: background 0.15s;
+}
+.plat-toggle-btn:active { background: rgba(0,212,255,0.15); }
+
+/* 已选平台预览卡片 */
+.plat-selected-preview { margin-top: 4px; }
+.plat-selected-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.plat-selected-card:active { opacity: 0.7; }
+.plat-selected-cat {
+  margin-left: auto;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 8px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+.plat-empty-hint {
+  padding: 12px;
+  text-align: center;
+  font-size: 12px; color: #5a7080;
+  border: 1px dashed rgba(99,179,237,0.2);
+  border-radius: 10px;
+}
 </style>
