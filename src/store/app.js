@@ -115,19 +115,106 @@ export const PURPOSE_TAGS = [
 export const RECHARGE_TYPE_LABELS = Object.fromEntries(RECHARGE_TYPES.map(t => [t.value, t.label]))
 export const PURPOSE_LABELS = Object.fromEntries(PURPOSE_TAGS.map(t => [t.value, t.label]))
 
-// ===== 投入指数算法 =====
+// ===== AI 效能评分体系（按《AI时代的绩效考核框架》v1.0）=====
+// 总分 = 投入指数（50分）+ 产出指数（50分）
+
+/** 投入指数：充值金额（20分）*/
+export function calcAmountScore(totalAmount) {
+  if (totalAmount >= 200) return 20
+  if (totalAmount >= 100) return 15
+  if (totalAmount >= 50)  return 10
+  if (totalAmount >= 20)  return 5
+  if (totalAmount >= 1)   return 2
+  return 0
+}
+
+/** 投入指数：大模型多样性（15分）*/
+export function calcModelDiversityScore(modelCount) {
+  if (modelCount >= 4) return 15
+  if (modelCount === 3) return 12
+  if (modelCount === 2) return 8
+  if (modelCount === 1) return 4
+  return 0
+}
+
+/** 投入指数：使用频次（15分）*/
+export function calcFrequencyScore(recordCount) {
+  if (recordCount >= 5) return 15
+  if (recordCount >= 3) return 12
+  if (recordCount === 2) return 8
+  if (recordCount === 1) return 4
+  return 0
+}
+
+/** 产出指数：场景多样性（15分）*/
+export function calcSceneDiversityScore(purposeCount) {
+  if (purposeCount >= 4) return 15
+  if (purposeCount === 3) return 12
+  if (purposeCount === 2) return 8
+  if (purposeCount === 1) return 4
+  return 0
+}
+
+/**
+ * 计算投入指数（满分50分）
+ * @param {Array} records - 近30天充值记录
+ * @returns {{ amountScore, modelScore, freqScore, inputTotal, breakdown }}
+ */
 export function calcInputScore(records) {
-  if (!records || records.length === 0) return 0
+  if (!records || records.length === 0) {
+    return { amountScore: 0, modelScore: 0, freqScore: 0, inputTotal: 0, breakdown: { amount: 0, modelCount: 0, recordCount: 0 } }
+  }
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-  const recentRecords = records.filter(r => new Date(r.rechargeDate) >= thirtyDaysAgo)
-  const totalAmount = recentRecords.reduce((s, r) => s + Number(r.amount), 0)
-  const platformCount = new Set(recentRecords.map(r => r.platform)).size
-  const purposeCount = new Set(recentRecords.flatMap(r => r.purposeTags)).size
-  const amountScore = Math.min(totalAmount / 500 * 40, 40)
-  const platformScore = Math.min(platformCount * 8, 24)
-  const purposeScore = Math.min(purposeCount * 4.5, 36)
-  return Math.round(amountScore + platformScore + purposeScore)
+  const recent = records.filter(r => new Date(r.rechargeDate) >= thirtyDaysAgo)
+  const totalAmount = recent.reduce((s, r) => s + Number(r.amount), 0)
+  const modelCount = new Set(recent.map(r => r.llmModel).filter(Boolean)).size
+  const recordCount = recent.length
+  const amountScore = calcAmountScore(totalAmount)
+  const modelScore = calcModelDiversityScore(modelCount)
+  const freqScore = calcFrequencyScore(recordCount)
+  return {
+    amountScore,
+    modelScore,
+    freqScore,
+    inputTotal: amountScore + modelScore + freqScore,
+    breakdown: { amount: totalAmount, modelCount, recordCount },
+  }
+}
+
+/**
+ * 计算产出指数（满分50分）
+ * 场景多样性（15分）自动计算；用途说明质量（20分）+ 管理员综合评价（15分）由管理员手动打分
+ * @param {Array} records - 近30天充值记录
+ * @param {number} descQualityScore - 用途说明质量分（0-20，管理员打分，默认10）
+ * @param {number} managerScore - 管理员综合评价分（0-15，默认8）
+ */
+export function calcOutputScore(records, descQualityScore = 10, managerScore = 8) {
+  if (!records || records.length === 0) return { sceneScore: 0, descScore: 0, managerScore: 0, outputTotal: 0 }
+  const now = new Date()
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const recent = records.filter(r => new Date(r.rechargeDate) >= thirtyDaysAgo)
+  const purposeCount = new Set(recent.flatMap(r => r.purposeTags)).size
+  const sceneScore = calcSceneDiversityScore(purposeCount)
+  const safeDescScore = Math.min(Math.max(Number(descQualityScore) || 0, 0), 20)
+  const safeManagerScore = Math.min(Math.max(Number(managerScore) || 0, 0), 15)
+  return {
+    sceneScore,
+    descScore: safeDescScore,
+    managerScore: safeManagerScore,
+    outputTotal: sceneScore + safeDescScore + safeManagerScore,
+  }
+}
+
+/** 计算 AI 效能总分（投入50 + 产出50 = 100分）*/
+export function calcEfficiencyScore(records, descQualityScore, managerScore) {
+  const input = calcInputScore(records)
+  const output = calcOutputScore(records, descQualityScore, managerScore)
+  return {
+    ...input,
+    ...output,
+    total: input.inputTotal + output.outputTotal,
+  }
 }
 
 // ===== Mock 数据 =====
@@ -195,11 +282,23 @@ export const useAppStore = defineStore('app', () => {
   const currentUser = ref({ id: 1, name: '张伟', openId: 'user_001', role: 'user' })
   const records = ref([...ALL_RECORDS])
 
+  // 管理员对每个成员的产出指数手动打分（用途说明质量 + 综合评价）
+  // 格式：{ [userId]: { descScore: 0-20, managerScore: 0-15 } }
+  const managerScores = ref({
+    1: { descScore: 16, managerScore: 13 },  // 张伟 - 优秀
+    2: { descScore: 14, managerScore: 11 },  // 李娜 - 良好
+    3: { descScore: 9,  managerScore: 7  },  // 王芳 - 一般
+    4: { descScore: 12, managerScore: 10 },  // 刘洋 - 良好
+    5: { descScore: 6,  managerScore: 5  },  // 陈静 - 待改进
+  })
+
   const myRecords = computed(() =>
     records.value.filter(r => r.userId === currentUser.value.id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   )
 
-  const inputScore = computed(() => calcInputScore(myRecords.value))
+  // 当前用户的投入指数详情
+  const inputScoreDetail = computed(() => calcInputScore(myRecords.value))
+  const inputScore = computed(() => inputScoreDetail.value.inputTotal)
 
   const thisMonth = computed(() => new Date().toISOString().slice(0, 7))
   const monthAmount = computed(() =>
@@ -240,25 +339,49 @@ export const useAppStore = defineStore('app', () => {
     return Object.values(map).sort((a, b) => b.amount - a.amount)
   })
 
-  // ===== 管理员数据 =====
+   // ===== 管理员数据 =====
   const allRecords = computed(() => [...records.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
-
   const memberStats = computed(() => {
     return MOCK_MEMBERS.map(m => {
       const mrs = records.value.filter(r => r.userId === m.id)
-      const score = calcInputScore(mrs)
+      const ms = managerScores.value[m.id] || { descScore: 10, managerScore: 8 }
+      const input = calcInputScore(mrs)
+      const output = calcOutputScore(mrs, ms.descScore, ms.managerScore)
       const total = mrs.reduce((s, r) => s + Number(r.amount), 0)
       const platforms = new Set(mrs.map(r => r.platform)).size
       const purposes = new Set(mrs.flatMap(r => r.purposeTags)).size
-      return { ...m, score, total, recordCount: mrs.length, platforms, purposes }
+      return {
+        ...m,
+        // 投入指数明细
+        amountScore: input.amountScore,
+        modelScore: input.modelScore,
+        freqScore: input.freqScore,
+        inputTotal: input.inputTotal,
+        // 产出指数明细
+        sceneScore: output.sceneScore,
+        descScore: output.descScore,
+        managerEvalScore: output.managerScore,
+        outputTotal: output.outputTotal,
+        // 总分
+        score: input.inputTotal + output.outputTotal,
+        // 其他统计
+        total, recordCount: mrs.length, platforms, purposes,
+        breakdown: input.breakdown,
+      }
     }).sort((a, b) => b.score - a.score)
   })
-
   const deptTotal = computed(() => records.value.reduce((s, r) => s + Number(r.amount), 0))
   const deptAvgScore = computed(() => {
     const scores = memberStats.value.map(m => m.score)
     return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0
   })
+  // 管理员更新成员产出指数打分
+  function updateManagerScore(userId, descScore, managerScore) {
+    managerScores.value[userId] = {
+      descScore: Math.min(Math.max(Number(descScore) || 0, 0), 20),
+      managerScore: Math.min(Math.max(Number(managerScore) || 0, 0), 15),
+    }
+  }
 
   const deptMonthlyTrend = computed(() => {
     const months = []
@@ -347,6 +470,7 @@ export const useAppStore = defineStore('app', () => {
     allRecords, memberStats, deptTotal, deptAvgScore, deptMonthlyTrend,
     platformStats, purposeStats, modelStats, categoryStats,
     channelStats, totalDiscount,
+    managerScores, updateManagerScore,
     addRecord, deleteRecord, switchRole,
   }
 })

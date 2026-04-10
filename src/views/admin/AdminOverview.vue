@@ -21,7 +21,7 @@
           <div class="kpi-cell-val" style="color:#00d4ff;">¥{{ store.deptTotal }}</div>
         </div>
         <div class="kpi-cell">
-          <div class="kpi-cell-label">平均投入指数</div>
+          <div class="kpi-cell-label">平均效能分</div>
           <div class="kpi-cell-val" style="color:#a855f7;">{{ store.deptAvgScore }}</div>
         </div>
         <div class="kpi-cell">
@@ -61,14 +61,14 @@
     <!-- TOP 5 排名 -->
     <div class="section" style="padding-bottom:20px;">
       <div class="section-header">
-        <div class="section-title">投入排名 TOP 5</div>
+        <div class="section-title">AI 效能排名 TOP 5</div>
       </div>
       <div class="rank-list">
         <div v-for="(m, i) in store.memberStats.slice(0, 5)" :key="m.id" class="rank-item">
           <div class="rank-num" :class="'rn-'+i">{{ i+1 }}</div>
           <div class="rank-info">
             <div class="rank-name">{{ m.name }}</div>
-            <div class="rank-meta">{{ m.recordCount }} 条记录 · ¥{{ m.total }}</div>
+            <div class="rank-meta">投入 <span style="color:#00d4ff;">{{ m.inputTotal }}</span> · 产出 <span style="color:#a855f7;">{{ m.outputTotal }}</span></div>
           </div>
           <div class="rank-score">
             <span class="rank-score-val">{{ m.score }}</span>

@@ -24,10 +24,10 @@
       <!-- 核心指标 -->
       <div class="hero-kpi">
         <div class="kpi-main">
-          <div class="kpi-label">投入指数</div>
-          <div class="kpi-value">{{ store.inputScore }}<span class="kpi-unit">/100</span></div>
+          <div class="kpi-label">AI 效能分</div>
+          <div class="kpi-value">{{ store.inputScore }}<span class="kpi-unit">/50</span></div>
           <div class="kpi-bar">
-            <div class="kpi-bar-fill" :style="{ width: store.inputScore + '%' }"></div>
+            <div class="kpi-bar-fill" :style="{ width: (store.inputScore / 50 * 100) + '%' }"></div>
           </div>
         </div>
         <div class="kpi-ring-wrap">
@@ -41,7 +41,7 @@
             <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
             <circle cx="50" cy="50" r="42" fill="none" stroke="url(#ringGrad)" stroke-width="6"
               stroke-linecap="round" stroke-dasharray="264"
-              :stroke-dashoffset="264 - (store.inputScore / 100) * 264"
+              :stroke-dashoffset="264 - (store.inputScore / 50) * 264"
               transform="rotate(-90 50 50)"
               style="filter:drop-shadow(0 0 6px rgba(0,212,255,0.7)); transition: stroke-dashoffset 0.8s ease;"/>
           </svg>
